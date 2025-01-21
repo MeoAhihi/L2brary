@@ -2,7 +2,7 @@ extends layout
 
 block content
     h1 Tạo Sinh Viên
-    form(action="/createSinhVien" method="post")
+    form(action="/sinhvien/create" method="post")
         div(style="margin: 10px")
             label(for="fullName") Full Name:
             input(type="text" id="fullName" name="fullName" required)
@@ -11,10 +11,10 @@ block content
             input(type="date" id="birthday" name="birthday" required)
         div(style="margin: 10px")
             label Gender:
-            input(type="radio" id="male" name="gender" value="male" required)
-            label(for="male") Male
-            input(type="radio" id="female" name="gender" value="female" required)
-            label(for="female") Female
+            input(type="radio" id="male" name="isMale" value="true" required)
+            label(for="male") Nam
+            input(type="radio" id="female" name="isMale" value="false" required)
+            label(for="female") Nữ
         div(style="margin: 10px")
             label Group:
             input(type="radio" id="group1" name="group" value="1" required)

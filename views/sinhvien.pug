@@ -11,7 +11,7 @@ block content
                 th Ngày sinh
                 th Giới tính
                 th Tổ
-                th Trặng thái
+                th Trạng thái
                 th(colspan=2) Hành động
         tbody
             each sv, index in sinhviens
@@ -19,10 +19,12 @@ block content
                     td= index + 1
                     td= sv.fullName
                     td= sv.birthday
-                    td= sv.gender 
+                    td= sv.isMale ? 'Nam' : 'Nữ'  
                     td= sv.group
                     td= sv.status
-                    td 
-                        a(href='/sinhvien/edit/' + sv._id) Sửa
                     td
-                        a(href='/sinhvien/delete/' + sv._id) Xóa
+                        form(action='/sinhvien/delete/' + sv._id, method='post')
+                            button(type='submit') Xóa 
+                    td
+                        form(action="/sinhvien/edit/" + sv._id, method="get")
+                            button(type="submit") Sửa
