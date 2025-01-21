@@ -1,0 +1,25 @@
+extends layout
+
+block content
+    h1 Tạo Sinh Viên
+    form(action="/createSinhVien" method="post")
+        div(style="margin: 10px")
+            label(for="fullName") Full Name:
+            input(type="text" id="fullName" name="fullName" required)
+        div(style="margin: 10px")
+            label(for="birthday") Birthday:
+            input(type="date" id="birthday" name="birthday" required)
+        div(style="margin: 10px")
+            label Gender:
+            input(type="radio" id="male" name="gender" value="male" required)
+            label(for="male") Male
+            input(type="radio" id="female" name="gender" value="female" required)
+            label(for="female") Female
+        div(style="margin: 10px")
+            label Group:
+            input(type="radio" id="group1" name="group" value="1" required)
+            label(for="group1") 1
+            input(type="radio" id="group2" name="group" value="2" required)
+            label(for="group2") 2
+        div(style="margin: 10px")
+            button(type="submit") Submit

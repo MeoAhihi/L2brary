@@ -1,0 +1,28 @@
+extends layout
+
+block content
+    h1 Sinh Viên
+    a(href='/sinhvien/create' style="padding: 10px") Tạo mới
+    table(border=1 cellpadding=10)
+        thead
+            tr
+                th Stt
+                th Họ và Tên
+                th Ngày sinh
+                th Giới tính
+                th Tổ
+                th Trặng thái
+                th(colspan=2) Hành động
+        tbody
+            each sv, index in sinhviens
+                tr
+                    td= index + 1
+                    td= sv.fullName
+                    td= sv.birthday
+                    td= sv.gender 
+                    td= sv.group
+                    td= sv.status
+                    td 
+                        a(href='/sinhvien/edit/' + sv._id) Sửa
+                    td
+                        a(href='/sinhvien/delete/' + sv._id) Xóa
