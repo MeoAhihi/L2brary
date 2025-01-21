@@ -1,0 +1,60 @@
+extends layout
+
+block content
+    h1 Điểm danh
+
+    form(action="/attendance" method="post")
+        div(style="margin: 10px")
+            label(for="sinhvienIds") Sinh viên:
+            select(id="sinhvienIds" name="sinhvienIds" multiple)
+                each sv in sinhviens
+                    option(value=sv._id)= sv.fullName
+
+        div(style="margin: 10px")
+            label(for="classId") Lớp:
+            select(id="classId" name="classId")
+                option(value="yoga") Yoga
+                option(value="zumba") Zumba
+                option(value="pilates") Pilates
+
+        input(type="hidden" name="submitTime" value=new Date())
+
+        button(type="submit") Điểm danh
+
+    h1 Danh sách điểm danh
+
+    form(action="/attendance" method="get")
+        div(style="margin: 10px")
+            label(for="classId") Lớp học:
+            select(id="classId" name="classId")
+                option(value="all") All
+                option(value="yoga") Yoga
+                option(value="zumba") Zumba
+                option(value="pilates") Pilates
+        div(style="margin: 10px")
+            label(for="date") Ngày:
+            input(type="date" id="date" name="date")
+        div(style="margin: 10px")
+            button(type="submit") Lọc
+
+    table(border="1" cellpadding="10" ) 
+        thead
+            tr
+                th Họ và Tên
+                th Ngày
+                th Giờ
+                th Lớp học
+                th Hoạt động
+        tbody
+            each record in records
+                tr
+                    td= record.name
+                    td= record.date
+                    td= record.time
+                    td= record.class
+                    td
+                        form(action="/attendance/delete/"+record.id method="post") 
+                            button(type="submit") Xóa
+
+    script.
+        document.getElementById('date').value = (new Date()).toISOString().split("T")[0]
