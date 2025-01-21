@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Get attendance list
 router.get("/", async (req, res) => {
-  const { classId, date } = req.query;
+  const { classId } = req.query;
   const query = {};
   if (classId?.toLowerCase() !== "all") query.classId = classId;
   // if (date)
