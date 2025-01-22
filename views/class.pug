@@ -1,0 +1,35 @@
+extends layout 
+
+block content
+
+    h1 Danh sách Lớp học
+
+    form(action="/class" method="get")
+        div(style="margin: 10px")
+            label(for="className") Lớp học:
+            input(id="className" name="className")
+        div(style="margin: 10px")
+            button(type="submit") Lọc
+
+    a(href="/class/new") Tạo lớp mới
+    table(border="1" cellpadding="10") 
+        thead
+            tr
+                th Tên Lớp
+                th Ngày học
+                th Giờ Bắt Đầu
+                th Giờ Kết Thúc
+                th(colspan=2) Hoạt động
+        tbody
+            each c in classes || []
+                tr
+                    td= c.name
+                    td= c.day
+                    td= c.startTime
+                    td= c.endTime
+                    td
+                        form(action="/class/edit/"+c.id, method="get") 
+                            button(type="submit") Sửa
+                    td
+                        form(action="/class/delete/"+c.id, method="get") 
+                            button(type="submit") Xóa

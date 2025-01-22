@@ -1,0 +1,28 @@
+extends layout
+
+block content
+
+    h1 Chỉnh sửa lớp mới
+
+    form(action="/class/edit/"+id method="post")
+        div(style="margin: 10px")
+            label(for="name") Name:
+            input(type="text" id="name" name="name" value=name required)
+        div(style="margin: 10px")
+            label(for="day") Day:
+            select(id="day" name="day" required)
+                option(value="Monday" selected=day==="Monday") Monday
+                option(value="Tuesday" selected=day==="Tuesday") Tuesday
+                option(value="Wednesday" selected=day==="Wednesday") Wednesday
+                option(value="Thursday" selected=day==="Thursday") Thursday
+                option(value="Friday" selected=day==="Friday") Friday
+                option(value="Saturday" selected=day==="Saturday") Saturday
+                option(value="Sunday" selected=day==="Sunday") Sunday
+        div(style="margin: 10px")
+            label(for="startTime") Start Time:
+            input(type="time" id="startTime" name="startTime" value=startTime required)
+        div(style="margin: 10px")
+            label(for="endTime") End Time:
+            input(type="time" id="endTime" name="endTime" value=endTime required)
+        div(style="margin: 10px")
+            button(type="submit") Create Class
