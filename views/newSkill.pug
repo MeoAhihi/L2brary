@@ -1,0 +1,12 @@
+extends layout
+
+block content
+
+    h1 Tạo kỹ năng mới
+
+    form(action="/skill" method="post")
+        div(style="margin: 10px")
+            label(for="name") Tên:
+            input(type="text" id="name" name="name" required)
+        div(style="margin: 10px")
+            button(type="submit") Tạo Kỹ năng

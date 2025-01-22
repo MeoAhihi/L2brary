@@ -1,0 +1,12 @@
+extends layout
+
+block content
+
+    h1 Chỉnh sửa kỹ năng
+
+    form(action="/skill/edit/"+id, method="post")
+        div(style="margin: 10px")
+            label(for="name") Tên:
+            input(type="text" id="name" name="name" value=name required)
+        div(style="margin: 10px")
+            button(type="submit") Sửa Kỹ năng

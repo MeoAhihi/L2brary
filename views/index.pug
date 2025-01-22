@@ -1,6 +1,11 @@
 extends layout
 
+
 block content
+  style.
+    li {
+      margin-bottom: 10px;
+    }
   h1= title
   p Chào mừng đến với #{title}
 
@@ -12,3 +17,5 @@ block content
       a(href='/attendance') Quản lý điểm danh
     li
       a(href='/class') Quản lý lớp học
+    li 
+      a(href='/skill') Quản lý kỹ năng

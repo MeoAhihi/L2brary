@@ -1,0 +1,30 @@
+extends layout 
+
+block content
+
+    h1 Danh sách Kỹ năng
+
+    form(action="/skill" method="get")
+        div(style="margin: 10px")
+            label(for="skillName") Kỹ năng:
+            input(id="skillName" name="skillName")
+            button(type="submit" style="margin: 10px") Lọc
+
+    a(href="/skill/new") Tạo kỹ năng mới
+    table(border="1" cellpadding="10") 
+        thead
+            tr
+                th stt
+                th Tên kỹ năng
+                th(colspan=2) Hoạt động
+        tbody
+            each s, index in skills || []
+                tr
+                    td= index+1
+                    td= s.name
+                    td
+                        form(action="/skill/edit/"+s.id, method="get") 
+                            button(type="submit") Sửa
+                    td
+                        form(action="/skill/delete/"+s.id, method="post") 
+                            button(type="submit") Xóa
