@@ -2,7 +2,7 @@ extends layout
 
 block content
     h1 Chỉnh sửa Sinh Viên
-    form(action="/sinhvien/create" method="post")
+    form(action="/sinhvien/edit"+id method="post")
         div(style="margin: 10px")
             label(for="fullName") Full Name:
             input(type="text" id="fullName" name="fullName" value=fullName required)

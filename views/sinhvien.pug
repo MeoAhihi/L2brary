@@ -2,6 +2,13 @@ extends layout
 
 block content
     h1 Sinh Viên
+
+    form(action="/sinhvien" method="get")
+        div(style="margin: 10px")
+            label(for="fullName") Lớp học:
+            input(id="fullName" name="fullName")
+            button(type="submit" style="margin: 10px") Lọc
+
     a(href='/sinhvien/create' style="padding: 10px") Tạo mới
     table(border=1 cellpadding=10)
         thead
