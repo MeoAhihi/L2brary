@@ -1,5 +1,5 @@
 const express = require("express");
-const Class = require("../models/class");
+const Class = require("../models/Class");
 const { toVietnameseRegex } = require("../utils/vietnamese");
 
 const router = express.Router();
