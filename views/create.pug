@@ -1,0 +1,28 @@
+extends layout 
+
+block content
+    form(action=createRoute method="post")
+        each field in fields 
+            .row.m-3
+                .col-2
+                    label(for=field.label)= field.label 
+                .col 
+                    case (field.type)
+                        when "select"
+                            select.form-select(name=field.label id=field.label)
+                                each option in field.options 
+                                    option(value=option.value)= option.label
+                        when "checkboxes"
+                            each option in field.options 
+                                .form-check
+                                    input.form-check-input(type="checkbox" id=option name=option value=true)
+                                    label.form-check-label(for=option)= option 
+                        when "radios"
+                            each option in field.options 
+                                .form-check
+                                    input.form-check-input(type="radio" name=field.label id=option value=option)
+                                    label.form-check-label(for=option)= option
+                        default
+                            input.form-control(type=field.type id=field.label name=field.label value=field.label required=isRequired||false) 
+        .d-flex.justify-content-end
+            button.btn.btn-primary(type="submit") Create #{model}
