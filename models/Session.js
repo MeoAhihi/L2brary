@@ -2,20 +2,19 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const AttendanceSchema = new Schema({
-  sinhvienId: {
-    type: Schema.Types.ObjectId,
-    ref: "SinhVien",
-    required: true,
-  },
+const SessionSchema = new Schema({
   classId: {
     type: Schema.Types.String,
     ref: "Class",
     required: true,
   },
-  joined_at: {
+  startedAt: {
     type: Date,
     default: Date.now,
+    required: true,
+  },
+  endedAt: {
+    type: Date,
   },
 });
 

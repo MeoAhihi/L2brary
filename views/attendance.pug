@@ -13,9 +13,8 @@ block content
         div(style="margin: 10px")
             label(for="classId") Lớp:
             select(id="classId" name="classId")
-                option(value="yoga") Yoga
-                option(value="zumba") Zumba
-                option(value="pilates") Pilates
+                each cls in classes
+                    option(value=cls._id)= cls.name
 
         input(type="hidden" name="submitTime" value=new Date())
 

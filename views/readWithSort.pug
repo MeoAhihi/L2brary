@@ -1,0 +1,29 @@
+extend read 
+
+block tableHeader 
+    form.form-inline.my-2.my-lg-0.row.g-3(action="" method="get")
+    each filter in filterFields
+        .col-2
+            label(for=field.label)= field.label 
+        .col 
+            case (field.type)
+                when "select"
+                    select.form-select(name=field.label id=field.label)
+                        each option in field.options 
+                            option= option
+                when "checkboxes"
+                    each option in field.options 
+                        .form-check
+                            input.form-check-input(type="checkbox" id=option name=option value=true)
+                            label.form-check-label(for=option)= option 
+                when "radios"
+                    each option in field.options 
+                        .form-check
+                            input.form-check-input(type="radio" name=field.label id=option value=option)
+                            label.form-check-label(for=option)= option
+                default
+                    input.form-control(type=field.type id=field.label name=field.label value=field.value required=isRequired||false) 
+            .col-10
+                input.form-control.mr-sm-2(type="search" name="query" placeholder="Search..." )
+            .col-2
+                button.btn.btn-outline-success.my-2.my-sm-0(type="submit") Search
