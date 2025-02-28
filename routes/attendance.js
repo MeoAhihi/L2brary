@@ -19,14 +19,14 @@ router.get("/", async (req, res) => {
   })
     .populate("sinhvienId")
     .populate("classId");
-
+  console.log(records)
   res.render("attendance", {
     sinhviens,
     classes,
     records: records.map((record) => {
       return {
         id: record._id,
-        name: record.sinhvienId.fullName, // Assuming the SinhVien model has a fullName field
+        name: record.sinhvienId?.fullName, // Assuming the SinhVien model has a fullName field
         date: record.joined_at.toISOString().split("T")[0],
         time: record.joined_at.toString().substr(16, 8),
         class: record.classId.name,

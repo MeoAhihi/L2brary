@@ -26,6 +26,7 @@ router.get("/edit/:id", async (req, res) => {
   const sinhVien = await SinhVien.findById(req.params.id);
 
   res.render("editSinhVien", {
+    id: req.params.id,
     ...sinhVien._doc,
     birthday: sinhVien.birthday.toISOString().split("T")[0],
   });

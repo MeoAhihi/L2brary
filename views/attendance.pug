@@ -1,6 +1,12 @@
 extends layout
 
 block content
+
+    h1 QR Check in 
+
+    script(src="./javascripts/html5-qrcode.min.js") 
+    div(id="reader" style="width:500px;height:500px;border:1px solid #000;")   
+    script(src="./javascripts/qr-scanner-handler.js") 
     h1 Điểm danh
 
     form(action="/attendance" method="post")
@@ -26,13 +32,9 @@ block content
         div(style="margin: 10px")
             label(for="classId") Lớp học:
             select(id="classId" name="classId")
-                option(value="all") All
-                option(value="yoga") Yoga
-                option(value="zumba") Zumba
-                option(value="pilates") Pilates
-        //- div(style="margin: 10px")
-        //-     label(for="date") Ngày:
-        //-     input(type="date" id="date" name="date")
+                option(value="") Tất cả
+                each cls in classes
+                    option(value=cls._id)= cls.name
         div(style="margin: 10px")
             button(type="submit") Lọc
 
