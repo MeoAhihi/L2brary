@@ -9,7 +9,7 @@ block content
     script(src="./javascripts/qr-scanner-handler.js") 
     h1 Điểm danh
 
-    form(action="/attendance" method="post")
+    form#attendance-form(action="/attendance" method="post")
         div(style="margin: 10px")
             label(for="sinhvienIds") Sinh viên:
             select(id="sinhvienIds" name="sinhvienIds" multiple)

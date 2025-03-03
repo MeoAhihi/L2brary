@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/create", (req, res) => {
-  res.render("TaoSinhVien");
+  res.render("taoSinhVien");
 });
 
 router.get("/edit/:id", async (req, res) => {
