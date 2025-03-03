@@ -28,7 +28,7 @@ router.get("/edit/:id", async (req, res) => {
   res.render("editSinhVien", {
     id: req.params.id,
     ...sinhVien._doc,
-    birthday: sinhVien.birthday.toISOString().split("T")[0],
+    birthday: Date(sinhVien.birthday).substring(16,24)
   });
 });
 
