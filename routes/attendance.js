@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
   })
     .populate("sinhvienId")
     .populate("classId");
-  console.log(records)
+  console.log(records);
   res.render("attendance", {
     sinhviens,
     classes,
@@ -32,6 +32,17 @@ router.get("/", async (req, res) => {
         class: record.classId.name,
       };
     }),
+  });
+});
+
+router.get("/confirm", async (req, res) => {
+  const { classId, sinhvienId } = req.query;
+
+  const sinhvien = await SinhVien.findById(sinhvienId);
+  res.render("confirm", {
+    name: sinhvien.fullName,
+    classId,
+    sinhvienId,
   });
 });
 
