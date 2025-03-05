@@ -13,6 +13,11 @@ const AttendanceSchema = new Schema({
     ref: "Class",
     required: true,
   },
+  sessionId: {
+    type: Schema.Types.String,
+    ref: "Session",
+    required: true,
+  },
   joined_at: {
     type: Date,
     default: Date.now,
