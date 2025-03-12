@@ -1,0 +1,47 @@
+head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title L2brary QR code
+    script(src="https://rawgit.com/eligrey/FileSaver.js/master/FileSaver.js")
+    script(src="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js")
+    style.
+        body {
+            width: 98%;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+body
+
+    h1 Mã QR điểm danh của bạn
+    canvas(id="myCanvas" width="300" height="300" style="border:1px solid #000000;")
+    br
+    button(onclick="download_image()") Tải QR xuống 
+
+    script.
+        const qr = fetch(`https://quickchart.io/chart?cht=qr&chs=300x300&chl=L2BRARY_!{id}`)
+            .then(res => res.blob())
+            .then(blob => {
+                const img = new Image();
+                img.onload = function () {
+                    var c = document.getElementById("myCanvas");
+                    var ctx = c.getContext("2d");
+                    ctx.drawImage(img, 0, 0, 300, 300);
+                    ctx.font = "bold 20px Palatino Linotype";
+                    ctx.textAlign = "center";
+                    ctx.fillText('!{fullName}', 150, 290);
+                };
+                img.src = URL.createObjectURL(blob);
+            });
+        function download_image() {
+            // Dump the canvas contents to a file.
+            var canvas = document.getElementById("myCanvas");
+            canvas.toBlob(function (blob) {
+                url = window.URL.createObjectURL(blob);
+                window.location.assign(url);
+            }, "image/png");
+        };

@@ -4,6 +4,13 @@ const { toVietnameseRegex } = require("../utils/vietnamese");
 
 const router = express.Router();
 
+router.get("/qr", async (req, res) => {
+  const { id } = req.query;
+  const sinhVien = await SinhVien.findById(id);
+  console.log({ id: id, fullName: sinhVien.fullName });
+  res.render("qr", { id: id, fullName: sinhVien.fullName });
+});
+
 router.get("/", async (req, res) => {
   const { fullName } = req.query;
   const sinhviens = await SinhVien.find({
@@ -22,13 +29,19 @@ router.get("/create", (req, res) => {
   res.render("taoSinhVien");
 });
 
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
+
 router.get("/edit/:id", async (req, res) => {
   const sinhVien = await SinhVien.findById(req.params.id);
-
   res.render("editSinhVien", {
     id: req.params.id,
     ...sinhVien._doc,
-    birthday: Date(sinhVien.birthday).substring(16, 24),
+    birthday: formatDate(sinhVien.birthday),
   });
 });
 
