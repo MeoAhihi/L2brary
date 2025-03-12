@@ -47,7 +47,7 @@ router.get("/", async (req, res) => {
     },
   ]);
 
-  console.log(records);
+  // console.log(records);
 
   // const sesions = await Session.find()
   // console.log(sesions)
