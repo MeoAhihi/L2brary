@@ -29,6 +29,7 @@ router.get(
         },
       },
     ]);
+    
 
     // res.json(sessions);
     res.render("readMultiTable", {
