@@ -2,6 +2,7 @@ const express = require("express");
 const SinhVien = require("../models/SinhVien");
 const Attendance = require("../models/Attendance");
 const Class = require("../models/Class");
+const Session = require("../models/Session");
 
 const router = express.Router();
 
@@ -14,12 +15,42 @@ router.get("/", async (req, res) => {
 
   const sinhviens = await SinhVien.find();
   const classes = await Class.find();
-  const records = await Attendance.find(query, null, {
-    sort: { joined_at: -1 },
-  })
-    .populate("sinhvienId")
-    .populate("classId");
+
+  const records = await Attendance.aggregate([
+    {
+      $match: query,
+    },
+    {
+      $lookup: {
+        from: "sinhviens",
+        localField: "sinhvienId",
+        foreignField: "_id",
+        as: "sinhvienId",
+      },
+    },
+    {
+      $unwind: "$sinhvienId",
+    },
+    {
+      $lookup: {
+        from: "sessions",
+        localField: "sessionId",
+        foreignField: "_id",
+        as: "sessionId",
+      },
+    },
+    {
+      $unwind: "$sessionId",
+    },
+    {
+      $sort: { joined_at: -1 },
+    },
+  ]);
+
   console.log(records);
+
+  // const sesions = await Session.find()
+  // console.log(sesions)
   res.render("attendance", {
     sinhviens,
     classes,
@@ -29,7 +60,7 @@ router.get("/", async (req, res) => {
         name: record.sinhvienId?.fullName, // Assuming the SinhVien model has a fullName field
         date: record.joined_at.toISOString().split("T")[0],
         time: record.joined_at.toString().substr(16, 8),
-        class: record.classId.name,
+        session: record.sessionId.title,
       };
     }),
   });

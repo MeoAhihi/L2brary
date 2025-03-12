@@ -1,0 +1,29 @@
+extends layout 
+
+block content
+    h1 Tabular View
+
+    block tableHeader
+
+
+    a(href=createPage) Tạo mới
+    each page in pages
+        h2= page.title
+        table.table.table-striped
+            thead
+                tr
+                    th #id
+                    each header in headers 
+                        th= header
+                    th(colspan=1) Actions
+            tbody
+                each value, index in page.values
+                    tr
+                        td= index+1
+                        each header in headers 
+                            td= value[header]
+                        td
+                            form.d-inline(action=updatePage+"/"+value.id, method="get") 
+                                button.btn.btn-primary(type="submit") Update
+                            form.d-inline(action=deleteRoute+"/"+value.id, method="post") 
+                                button.btn.btn-danger(type="submit") Delete

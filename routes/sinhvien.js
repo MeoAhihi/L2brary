@@ -28,26 +28,34 @@ router.get("/edit/:id", async (req, res) => {
   res.render("editSinhVien", {
     id: req.params.id,
     ...sinhVien._doc,
-    birthday: Date(sinhVien.birthday).substring(16,24)
+    birthday: Date(sinhVien.birthday).substring(16, 24),
   });
 });
 
 router.post("/create", async (req, res) => {
   const newSinhVien = new SinhVien(req.body);
+
   await newSinhVien.save();
   res.redirect("/sinhvien");
 });
 
 router.post("/edit/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, birthday, isMale, group, status } = req.body;
-  await SinhVien.findByIdAndUpdate(id, {
-    name,
-    birthday,
-    isMale,
-    group,
-    status,
-  });
+  const { fullName, birthday, isMale, group, status } = req.body;
+  const newSinhVien = await SinhVien.findByIdAndUpdate(
+    id,
+    {
+      fullName,
+      birthday: new Date(birthday),
+      isMale,
+      group,
+      status,
+    },
+    {
+      returnDocument: "after",
+    }
+  );
+  console.log(req.body, newSinhVien);
   res.redirect("/sinhvien");
 });
 
