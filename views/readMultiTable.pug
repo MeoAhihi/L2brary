@@ -1,0 +1,44 @@
+extends layout 
+
+block content
+    h1= title
+
+    block tableHeader
+
+
+    a(href=createPage) Tạo mới
+    each page in pages
+        h2= page.title
+        table(border="1" cellpadding="10" ) 
+            thead
+                tr
+                    th #id
+                    each header in headers
+                        if !header.detailPage 
+                            th= header
+                        else
+                            th= header.name 
+                    th(colspan=page.span) Hành động
+            tbody
+                each value, index in page.values
+                    tr
+                        td= index+1
+                        each header in headers 
+                            if !header.detailPage 
+                                td= value[header]
+                            else
+                                td 
+                                    a(href=header.detailPage+"/"+value.id)= value[header.name]
+                        if page.isCreatable 
+                            td
+                                form.d-inline(action=createPage+"/"+value.id, method="get") 
+                                    button.btn.btn-primary(type="submit") Tạo mới
+                        if page.isEditable 
+                            td
+                                form.d-inline(action=updatePage+"/"+value.id, method="get") 
+                                    button.btn.btn-primary(type="submit") Sửa
+                        if page.isDeleteable
+                            td
+                                form.d-inline(action=deleteRoute+"/"+value.id, method="post") 
+                                    button.btn.btn-danger(type="submit") Xóa
+

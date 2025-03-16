@@ -4,10 +4,12 @@ block content
     div(style="height:80vh;width:90vw;display:flex;flex-direction:column;justify-content:center;align-items:center;") 
         p Xin chào, 
             h1=name 
+        p Bạn đang tham gia lớp 
+        p= className
         div(style="display:flex;gap:1rem")
             form(action="/attendance" method="post") 
                 input(type="hidden" name="sinhvienIds", value=sinhvienId)
-                input(type="hidden" name="classId", value=classId)
+                input(type="hidden" name="sessionId", value=sessionId)
                 button(type="submit") Xác nhận 
             form(action="/attendance" method="get") 
                 button.muted(type="submit") Thoát

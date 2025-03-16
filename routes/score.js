@@ -8,11 +8,26 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const { scoreName } = req.query;
-  const scores = await Score.find({
-    /*name: toVietnameseRegex(scoreName)*/
-  })
-    .populate("sinhVien")
-    .populate("skill");
+  const scores = await Score.aggregate([
+    {
+      $lookup: {
+        from: "sinhviens",
+        localField: "sinhVien",
+        foreignField: "_id",
+        as: "sinhVien"
+      }
+    },
+    {
+      $lookup: {
+        from: "skills",
+        localField: "skill",
+        foreignField: "_id",
+        as: "skill"
+      }
+    },
+  ]);
+    // .populate("sinhVien")
+    // .populate("skill");
   console.log(scores);
   res.render("read", {
     title: "Score",

@@ -8,9 +8,9 @@ const AttendanceSchema = new Schema({
     ref: "SinhVien",
     required: true,
   },
-  classId: {
+  sessionId: {
     type: Schema.Types.String,
-    ref: "Class",
+    ref: "Session",
     required: true,
   },
   joined_at: {

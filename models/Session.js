@@ -8,6 +8,10 @@ const SessionSchema = new Schema({
     ref: "Class",
     required: true,
   },
+  title: {
+    type: Schema.Types.String,
+    required: true,
+  },
   startedAt: {
     type: Date,
     default: Date.now,
@@ -16,8 +20,26 @@ const SessionSchema = new Schema({
   endedAt: {
     type: Date,
   },
+  attendance: [
+    {
+      sinhvienId: {
+        type: Schema.Types.String,
+        ref: "Sinhvien",
+        required: true,
+      },
+      sinhvienName: {
+        type: Schema.Types.String,
+        required: true,
+      },
+      joinTime: {
+        type: Date,
+        default: Date.now,
+        required: true,
+      },
+    },
+  ],
 });
 
-const Attendance = mongoose.model("Attendance", AttendanceSchema);
+const Session = mongoose.model("Session", SessionSchema);
 
-module.exports = Attendance;
+module.exports = Session;

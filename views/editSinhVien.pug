@@ -21,5 +21,9 @@ block content
             label(for="group1") 1
             input(type="radio" id="group2" name="group" value="2" checked=(group === "2") required)
             label(for="group2") 2
+            input(type="radio" id="group-monitor" name="group" value="Phụ trách" checked=(group === "Phụ trách") required)
+            label(for="group-monitor") Phụ trách
+            input(type="radio" id="group-non" name="group" value="Chưa phân tổ" checked=(group === "Chưa phân tổ") required)
+            label(for="group-non") Chưa phân tổ
         div(style="margin: 10px")
             button(type="submit") Submit

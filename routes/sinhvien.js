@@ -4,6 +4,12 @@ const { toVietnameseRegex } = require("../utils/vietnamese");
 
 const router = express.Router();
 
+router.get("/qr", async (req, res) => {
+  const { id } = req.query;
+  const sinhVien = await SinhVien.findById(id);
+  res.render("qr", { id: id, fullName: sinhVien.fullName });
+});
+
 router.get("/", async (req, res) => {
   const { fullName } = req.query;
   const sinhviens = await SinhVien.find({
@@ -22,32 +28,46 @@ router.get("/create", (req, res) => {
   res.render("taoSinhVien");
 });
 
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
+
 router.get("/edit/:id", async (req, res) => {
   const sinhVien = await SinhVien.findById(req.params.id);
-
   res.render("editSinhVien", {
     id: req.params.id,
     ...sinhVien._doc,
-    birthday: Date(sinhVien.birthday).substring(16,24)
+    birthday: formatDate(sinhVien.birthday),
   });
 });
 
 router.post("/create", async (req, res) => {
   const newSinhVien = new SinhVien(req.body);
+
   await newSinhVien.save();
   res.redirect("/sinhvien");
 });
 
 router.post("/edit/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, birthday, isMale, group, status } = req.body;
-  await SinhVien.findByIdAndUpdate(id, {
-    name,
-    birthday,
-    isMale,
-    group,
-    status,
-  });
+  const { fullName, birthday, isMale, group, status } = req.body;
+  const newSinhVien = await SinhVien.findByIdAndUpdate(
+    id,
+    {
+      fullName,
+      birthday: new Date(birthday),
+      isMale,
+      group,
+      status,
+    },
+    {
+      returnDocument: "after",
+    }
+  );
+  console.log(req.body, newSinhVien);
   res.redirect("/sinhvien");
 });
 
