@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const asyncHandler = require("express-async-handler");
 
+const mongoose = require("mongoose");
 const Session = require("../models/Session");
 const Class = require("../models/Class");
+const Attendance = require("../models/Attendance");
 
 router.get(
   "/",
@@ -29,31 +31,73 @@ router.get(
         },
       },
     ]);
-    
 
+    const ongoingSessions = await Session.find({ endedAt: null })
+      .lean()
+      .populate("classId");
+
+    const ongoingPage = {
+      isEditable: true,
+      isDeleteable: true,
+      isCreatable: false,
+      span: 2,
+      title: "Các tiết học đang diễn ra",
+      values: ongoingSessions.map((session) => ({
+        id: session._id,
+        "Tiết học": session.title,
+        Ngày: session.startedAt.toISOString().substr(0, 10),
+        "Bắt đầu": session.startedAt.toString().substr(16, 8),
+        "Kết thúc": "Chưa kết thúc",
+      })),
+    };
+
+    const sessionsInClasses = classes.map((cls) => ({
+      isEditable: true,
+      isDeleteable: true,
+      isCreatable: false,
+      span: 3,
+      title: `${cls.classDetails[0].name} ${cls.classDetails[0].day}(${cls.classDetails[0].startTime}-${cls.classDetails[0].endTime})`,
+      values: cls.sessions.map((session) => ({
+        id: session._id,
+        "Tiết học": session.title,
+        Ngày: session.startedAt.toISOString().substr(0, 10),
+        "Bắt đầu": session.startedAt.toString().substr(16, 8),
+        "Kết thúc": session.endedAt
+          ? session.endedAt.toString().substr(16, 8)
+          : "Chưa kết thúc",
+      })),
+    }));
     // res.json(sessions);
     res.render("readMultiTable", {
       title: "Danh sách tiết học",
       createPage: "/session/new",
       updatePage: "/session/edit",
       deleteRoute: "/session/delete",
-      headers: ["Tiết học", "Ngày", "Bắt đầu", "Kết thúc"],
-      pages: classes.map((cls) => ({
-        isEditable: true,
-        isDeleteable: true,
-        isCreatable: false,
-        span: 3,
-        title: `${cls.classDetails[0].name} ${cls.classDetails[0].day}(${cls.classDetails[0].startTime}-${cls.classDetails[0].endTime})`,
-        values: cls.sessions.map((session) => ({
-          id: session._id,
-          "Tiết học": session.title,
-          Ngày: session.startedAt.toISOString().substr(0, 10),
-          "Bắt đầu": session.startedAt.toString().substr(16, 8),
-          "Kết thúc": session.endedAt
-            ? session.endedAt.toString().substr(16, 8)
-            : "Chưa kết thúc",
-        })),
+      headers: [
+        { name: "Tiết học", detailPage: "/session" },
+        "Ngày",
+        "Bắt đầu",
+        "Kết thúc",
+      ],
+      pages: [ongoingPage, ...sessionsInClasses],
+    });
+  })
+);
+
+router.get(
+  "/:id",
+  asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const session = await Session.findById(id).populate("classId");
+    res.render("sessionAttendance", {
+      title: `${session.title} (${session.classId.name})`,
+      id: session._id,
+      headers: ["Họ và Tên", "Thời gian tham gia"],
+      values: session.attendance.map((sinhvien) => ({
+        "Họ và Tên": sinhvien.sinhvienName,
+        "Thời gian tham gia": sinhvien.joinTime.toString().substr(16, 8),
       })),
+      updateRoute: "/session",
     });
   })
 );

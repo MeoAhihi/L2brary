@@ -13,15 +13,22 @@ block content
             thead
                 tr
                     th #id
-                    each header in headers 
-                        th= header
+                    each header in headers
+                        if !header.detailPage 
+                            th= header
+                        else
+                            th= header.name 
                     th(colspan=page.span) Hành động
             tbody
                 each value, index in page.values
                     tr
                         td= index+1
                         each header in headers 
-                            td= value[header]
+                            if !header.detailPage 
+                                td= value[header]
+                            else
+                                td 
+                                    a(href=header.detailPage+"/"+value.id)= value[header.name]
                         if page.isCreatable 
                             td
                                 form.d-inline(action=createPage+"/"+value.id, method="get") 

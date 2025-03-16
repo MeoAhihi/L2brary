@@ -19,6 +19,7 @@ block content
                 th Giới tính
                 th Tổ
                 th Trạng thái
+                th Mã QR
                 th(colspan=2) Hành động
         tbody
             each sv, index in sinhviens
@@ -29,6 +30,8 @@ block content
                     td= sv.isMale ? 'Nam' : 'Nữ'  
                     td= sv.group
                     td= sv.status
+                    td
+                        a(href='/sinhvien/qr?id=' + sv._id) Xem
                     td
                         form(action='/sinhvien/delete/' + sv._id, method='post')
                             button(type='submit') Xóa 

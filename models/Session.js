@@ -20,6 +20,24 @@ const SessionSchema = new Schema({
   endedAt: {
     type: Date,
   },
+  attendance: [
+    {
+      sinhvienId: {
+        type: Schema.Types.String,
+        ref: "Sinhvien",
+        required: true,
+      },
+      sinhvienName: {
+        type: Schema.Types.String,
+        required: true,
+      },
+      joinTime: {
+        type: Date,
+        default: Date.now,
+        required: true,
+      },
+    },
+  ],
 });
 
 const Session = mongoose.model("Session", SessionSchema);

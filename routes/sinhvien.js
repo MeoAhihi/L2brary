@@ -7,7 +7,6 @@ const router = express.Router();
 router.get("/qr", async (req, res) => {
   const { id } = req.query;
   const sinhVien = await SinhVien.findById(id);
-  console.log({ id: id, fullName: sinhVien.fullName });
   res.render("qr", { id: id, fullName: sinhVien.fullName });
 });
 

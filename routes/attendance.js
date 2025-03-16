@@ -67,12 +67,15 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/confirm", async (req, res) => {
-  const { classId, sinhvienId } = req.query;
+  const { sessionId, sinhvienId } = req.query;
 
   const sinhvien = await SinhVien.findById(sinhvienId);
+  const session = await Session.findById(sessionId);
+  const classInfo = await Class.findById(session.classId);
   res.render("confirm", {
     name: sinhvien.fullName,
-    classId,
+    sessionId,
+    className: classInfo.name,
     sinhvienId,
   });
 });
@@ -142,27 +145,30 @@ router.get("/statistic", async (req, res) => {
 // Record new attendance
 router.post("/", async (req, res) => {
   try {
-    const { sinhvienIds, classId, submitTime } = req.body;
+    const { sinhvienIds, sessionId, submitTime = new Date() } = req.body;
 
-    // console.log(req.body);
-    const data =
-      sinhvienIds instanceof Array
-        ? sinhvienIds.map((sinhvienId) => ({
-            sinhvienId,
-            classId,
-            joined_at: submitTime,
-          }))
-        : [
-            {
-              sinhvienId: sinhvienIds,
-              classId,
-              joined_at: submitTime,
-            },
-          ];
-    await Attendance.insertMany(data);
+    const session = await Session.findById(sessionId);
+
+    async function addToAttendance(id) {
+      const sinhvien = await SinhVien.findById(id);
+
+      session.attendance.push({
+        sinhvienId: id,
+        sinhvienName: sinhvien.fullName,
+        joinTime: submitTime,
+      });
+    }
+    console.log(sinhvienIds, sessionId, submitTime);
+    if (sinhvienIds instanceof Array) {
+      await Promise.all(sinhvienIds.forEach(addToAttendance));
+    } else {
+      await addToAttendance(sinhvienIds);
+    }
+    // Add attendance to the session
+    await session.save();
 
     // Add your attendance recording logic here
-    res.redirect("/attendance");
+    res.redirect("/session/" + sessionId);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

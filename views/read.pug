@@ -1,19 +1,18 @@
 extends layout 
 
 block content
-    h1 Tabular View
+    h1= title
 
     block tableHeader
 
-
     a(href=createPage) Tạo mới
-    table.table.table-striped
+    table(border="1" cellpadding="10" ) 
         thead
             tr
                 th #id
                 each header in headers 
                     th= header
-                th(colspan=1) Actions
+                th(colspan=2) Hành động
         tbody
             each value, index in values
                 tr
@@ -23,5 +22,6 @@ block content
                     td
                         form.d-inline(action=updatePage+"/"+value.id, method="get") 
                             button.btn.btn-primary(type="submit") Update
+                    td
                         form.d-inline(action=deleteRoute+"/"+value.id, method="post") 
                             button.btn.btn-danger(type="submit") Delete
