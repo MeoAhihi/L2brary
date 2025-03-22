@@ -10,6 +10,20 @@ router.get("/qr", async (req, res) => {
   res.render("qr", { id: id, fullName: sinhVien.fullName });
 });
 
+router.get("/get-qr", async (req, res) => {
+  const { fullName } = req.query;
+  const sinhviens = await SinhVien.find({
+    fullName: toVietnameseRegex(fullName),
+  });
+
+  res.render("sinhvien copy", {
+    sinhviens: sinhviens.map((sv) => ({
+      ...sv._doc,
+      birthday: sv.birthday.toISOString().split("T")[0],
+    })),
+  });
+});
+
 router.get("/", async (req, res) => {
   const { fullName } = req.query;
   const sinhviens = await SinhVien.find({

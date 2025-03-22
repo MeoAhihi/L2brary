@@ -11,5 +11,5 @@ block content
                 input(type="hidden" name="sinhvienIds", value=sinhvienId)
                 input(type="hidden" name="sessionId", value=sessionId)
                 button(type="submit") Xác nhận 
-            form(action="/attendance" method="get") 
+            form(action="/session/"+sessionId method="get") 
                 button.muted(type="submit") Thoát

@@ -85,27 +85,11 @@ router.get(
 );
 
 router.get(
-  "/:id",
-  asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const session = await Session.findById(id).populate("classId");
-    res.render("sessionAttendance", {
-      title: `${session.title} (${session.classId.name})`,
-      id: session._id,
-      headers: ["Họ và Tên", "Thời gian tham gia"],
-      values: session.attendance.map((sinhvien) => ({
-        "Họ và Tên": sinhvien.sinhvienName,
-        "Thời gian tham gia": sinhvien.joinTime.toString().substr(16, 8),
-      })),
-      updateRoute: "/session",
-    });
-  })
-);
-
-router.get(
   "/new",
   asyncHandler(async (req, res, next) => {
+    console.log("🚀 ~ asyncHandler ~ res:", res);
     const classes = await Class.find();
+    console.log("🚀 ~ asyncHandler ~ classes:", classes);
     res.render("create", {
       createRoute: "/session",
       fields: [
@@ -125,6 +109,24 @@ router.get(
           placeholder: "Bắt đầu",
         },
       ],
+    });
+  })
+);
+
+router.get(
+  "/:id",
+  asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const session = await Session.findById(id).populate("classId");
+    res.render("sessionAttendance", {
+      title: `${session.title} (${session.classId.name})`,
+      id: session._id,
+      headers: ["Họ và Tên", "Thời gian tham gia"],
+      values: session.attendance.map((sinhvien) => ({
+        "Họ và Tên": sinhvien.sinhvienName,
+        "Thời gian tham gia": sinhvien.joinTime.toString().substr(16, 8),
+      })),
+      updateRoute: "/session",
     });
   })
 );

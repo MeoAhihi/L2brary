@@ -50,7 +50,6 @@ router.get("/", async (req, res) => {
       },
     },
   ]);
-  console.log(JSON.stringify(sinhviens, null, 1));
   res.render("readMultiTable", {
     title: "Điểm số",
     headers: ["Kỹ năng", "Điểm số"],
