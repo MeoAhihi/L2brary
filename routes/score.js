@@ -8,36 +8,96 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const { scoreName } = req.query;
+  const sinhviens = await Score.aggregate([
+    {
+      $group: {
+        _id: {
+          sinhvien: "$sinhVien",
+          skill: "$skill",
+        },
+        score: {
+          $sum: "$score",
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "skills",
+        localField: "_id.skill",
+        foreignField: "_id",
+        as: "skillInfo",
+      },
+    },
+    {
+      $group: {
+        _id: "$_id.sinhvien",
+        scores: {
+          $push: {
+            skill: {
+              $first: "$skillInfo",
+            },
+            score: "$score",
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "sinhviens",
+        localField: "_id",
+        foreignField: "_id",
+        as: "sinhVien",
+      },
+    },
+  ]);
+  console.log(JSON.stringify(sinhviens, null, 1));
+  res.render("readMultiTable", {
+    title: "Điểm số",
+    headers: ["Kỹ năng", "Điểm số"],
+    pages: sinhviens.map((sinhvien) => ({
+      span: 0,
+      title: sinhvien.sinhVien[0].fullName,
+      values: sinhvien.scores.map((score) => ({
+        id: score._id,
+        "Kỹ năng": score.skill.name,
+        "Điểm số": score.score,
+      })),
+    })),
+    createPage: "/score/new",
+    updatePage: "/score/edit",
+    deleteRoute: "/score/delete",
+  });
+});
+
+router.get("/history", async (req, res) => {
+  const { scoreName } = req.query;
   const scores = await Score.aggregate([
     {
       $lookup: {
         from: "sinhviens",
         localField: "sinhVien",
         foreignField: "_id",
-        as: "sinhVien"
-      }
+        as: "sinhVien",
+      },
     },
     {
       $lookup: {
         from: "skills",
         localField: "skill",
         foreignField: "_id",
-        as: "skill"
-      }
+        as: "skillInfo",
+      },
     },
   ]);
-    // .populate("sinhVien")
-    // .populate("skill");
-  console.log(scores);
   res.render("read", {
-    title: "Score",
-    headers: ["SinhVien", "Skill", "Score", "Created At"],
+    title: "Lịch sử điểm số",
+    headers: ["Họ và Tên", "Kỹ năng", "Điểm số", "Thời điểm"],
     values: scores.map((score) => ({
       id: score._id,
-      SinhVien: score.sinhVien.fullName,
-      Skill: score.skill.name,
-      Score: score.score,
-      "Created At": score.createdAt,
+      "Họ và Tên": score.sinhVien[0].fullName,
+      "Kỹ năng": score.skillInfo[0]?.name,
+      "Điểm số": score.score,
+      "Thời điểm": score.createdAt,
     })),
     createPage: "/score/new",
     updatePage: "/score/edit",
@@ -77,8 +137,8 @@ router.get("/edit/:id", async (req, res) => {
   const scoreToEdit = await Score.findById(id)
     .populate("sinhVien")
     .populate("skill");
-    res.render("update", {
-      id: scoreToEdit._id,
+  res.render("update", {
+    id: scoreToEdit._id,
     title: "Update Score",
     fields: [
       {

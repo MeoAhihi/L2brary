@@ -18,7 +18,8 @@ block content
                             th= header
                         else
                             th= header.name 
-                    th(colspan=page.span) Hành động
+                    if page.span!==0
+                        th(colspan=page.span) Hành động
             tbody
                 each value, index in page.values
                     tr
