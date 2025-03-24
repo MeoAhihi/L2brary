@@ -11,7 +11,7 @@ block content
         div(style="margin: 10px")
             button(type="submit") Lọc
 
-    a(href="/class/new") Tạo lớp mới
+    a(href="new") Tạo lớp mới
     table(border="1" cellpadding="10") 
         thead
             tr
@@ -28,8 +28,8 @@ block content
                     td= c.startTime
                     td= c.endTime
                     td
-                        form(action="/class/edit/"+c.id, method="get") 
+                        form(action="edit/"+c._id, method="get") 
                             button(type="submit") Sửa
                     td
-                        form(action="/class/delete/"+c.id, method="get") 
+                        form(action="delete/"+c._id, method="post") 
                             button(type="submit") Xóa

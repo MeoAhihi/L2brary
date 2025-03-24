@@ -13,16 +13,18 @@ block content
   ul
     li
       a(href='/sinhvien') Quản lý sinh viên
-    li
-      a(href='/attendance') Quản lý điểm danh
-    li
-      a(href='/class') Quản lý lớp học
-    li
-      a(href='/session') Quản lý buổi học
-    li 
-      a(href='/skill') Quản lý kỹ năng
-    li
-      a(href='/score') Quản lý điểm số
+    //- li
+    //-   a(href='/attendance') Quản lý điểm danh
+    for classGroup in classGroups
+      h2= classGroup.name
+      li
+        a(href=`${classGroup._id}/class/`) Quản lý lớp học
+      li
+        a(href=`${classGroup._id}/session`) Quản lý buổi học
+      li 
+        a(href=`${classGroup._id}/skill`) Quản lý kỹ năng
+      li
+        a(href=`${classGroup._id}/score`) Quản lý điểm số
 
   h1 Thống kê
   ul 

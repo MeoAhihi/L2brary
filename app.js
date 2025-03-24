@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 require("dotenv").config();
 require("./db");
+const expressAsyncHandler = require("express-async-handler");
+const ClassGroup = require("./models/ClassGroup");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -27,14 +29,24 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+const classGroupMiddleware = expressAsyncHandler(async (req, res, next) => {
+  const { classGroupId } = req.params;
+  const classGroup = await ClassGroup.findById(classGroupId);
+  if (!classGroup) {
+    return next(createError(404));
+  }
+  req.classGroup = classGroup;
+  next();
+});
+
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/sinhvien", sinhvienRouter);
-app.use("/attendance", attendanceRouter);
-app.use("/class", classRouter);
-app.use("/skill", skillRouter);
-app.use("/score", scoreRouter);
-app.use("/session", sessionRouter);
+app.use("/:classGroupId/attendance", classGroupMiddleware, attendanceRouter);
+app.use("/:classGroupId/class", classGroupMiddleware, classRouter);
+app.use("/:classGroupId/skill", classGroupMiddleware, skillRouter);
+app.use("/:classGroupId/score", classGroupMiddleware, scoreRouter);
+app.use("/:classGroupId/session", classGroupMiddleware, sessionRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
