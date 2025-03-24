@@ -6,7 +6,11 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const { className } = req.query;
-  const classes = await Class.find({ name: toVietnameseRegex(className) });
+  const classes = await Class.find({
+    name: toVietnameseRegex(className),
+    classGroup: req.classGroup.name,
+  });
+  console.log("🚀 ~ router.get ~ classes:", classes);
 
   res.render("class", {
     classes,
@@ -25,23 +29,35 @@ router.get("/edit/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const { name, day, startTime, endTime } = req.body;
-  const newClass = new Class({ name, day, startTime, endTime });
+  const newClass = new Class({
+    name,
+    day,
+    startTime,
+    endTime,
+    classGroup: req.classGroup.name,
+  });
   await newClass.save();
 
-  res.redirect("/class");
+  res.redirect(".");
 });
 
 router.post("/edit/:id", async (req, res) => {
   const { id } = req.params;
   const { name, day, startTime, endTime } = req.body;
-  await Class.findByIdAndUpdate(id, { name, day, startTime, endTime });
-  res.redirect("/class");
+  await Class.findByIdAndUpdate(id, {
+    name,
+    day,
+    startTime,
+    endTime,
+  });
+  res.redirect("..");
 });
 
 router.post("/delete/:id", async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
+
   await Class.findByIdAndDelete(id);
-  res.redirect("/class");
+  res.redirect("..");
 });
 
 module.exports = router;
