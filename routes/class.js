@@ -81,6 +81,7 @@ router.get("/edit/:id", async (req, res) => {
   const classToEdit = await Class.findById(id);
   res.render("update", {
     id: classToEdit._id,
+    updateRoute: `/${req.classGroup._id}/session/${id}`,
     title: "Chỉnh sửa lớp học",
     fields: [
       {
@@ -117,7 +118,6 @@ router.get("/edit/:id", async (req, res) => {
         value: classToEdit.endTime,
       },
     ],
-    updateRoute: `/${req.classGroup._id}/session`,
   });
 });
 

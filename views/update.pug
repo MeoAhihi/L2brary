@@ -1,7 +1,7 @@
 extends layout 
 
 block content
-    form(action=id method="post")
+    form(action=updateRoute method="post")
         each field in fields 
             .row.m-3
                 .col-2
@@ -23,6 +23,6 @@ block content
                                     input.form-check-input(type="radio" name=field.label id=option value=option)
                                     label.form-check-label(for=option)= option
                         default
-                            input.form-control(type=field.type id=field.label name=field.label value=field.value required=isRequired||false) 
+                            input.form-control(type=field.type id=field.label name=field.name value=field.value required=isRequired||false) 
         .d-flex.justify-content-end
-            button.btn.btn-primary(type="submit") Update #{model}
+            button.btn.btn-primary(type="submit") Cập nhật #{model}

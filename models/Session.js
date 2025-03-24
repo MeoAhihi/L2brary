@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const SessionSchema = new Schema({
   classId: {
-    type: Schema.Types.String,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Class",
     required: true,
   },
@@ -15,7 +15,6 @@ const SessionSchema = new Schema({
   startedAt: {
     type: Date,
     default: Date.now,
-    required: true,
   },
   endedAt: {
     type: Date,
@@ -23,7 +22,7 @@ const SessionSchema = new Schema({
   attendance: [
     {
       sinhvienId: {
-        type: Schema.Types.String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Sinhvien",
         required: true,
       },

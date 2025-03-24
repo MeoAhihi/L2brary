@@ -6,22 +6,36 @@ block content
     block tableHeader
 
     a(href=createPage) Tạo mới
-    table(border="1" cellpadding="10" ) 
+    table(class="table table-striped table-hover") 
         thead
             tr
                 th #id
-                each header in headers 
-                    th= header
-                th(colspan=2) Hành động
+                each header in headers
+                    if !header.detailPage
+                        th= header
+                    else
+                        th= header.name 
+                if span!==0
+                    th(colspan=span) Hành động
         tbody
             each value, index in values
                 tr
                     td= index+1
                     each header in headers 
-                        td= value[header]
-                    td
-                        form.d-inline(action=updatePage+"/"+value.id, method="get") 
-                            button.btn.btn-primary(type="submit") Update
-                    td
-                        form.d-inline(action=deleteRoute+"/"+value.id, method="post") 
-                            button.btn.btn-danger(type="submit") Delete
+                        if !header.detailPage 
+                            td= value[header]
+                        else
+                            td 
+                                a(href=header.detailPage+"/"+value.id)= value[header.name]
+                    if isCreatable 
+                        td
+                            form.d-inline(action=createPage+"/"+value.id, method="get") 
+                                button.btn.btn-primary(type="submit") Tạo mới
+                    if isEditable 
+                        td
+                            form.d-inline(action=updatePage+"/"+value.id, method="get") 
+                                button.btn.btn-primary(type="submit") Sửa
+                    if isDeleteable
+                        td
+                            form.d-inline(action=deleteRoute+"/"+value.id, method="post") 
+                                button.btn.btn-danger(type="submit") Xóa

@@ -32,54 +32,41 @@ router.get(
       },
     ]);
 
-    const ongoingSessions = await Session.find({ endedAt: null })
-      .lean()
-      .populate("classId");
+    const filter = classes.filter(
+      (cls) => cls.classDetails[0].classGroup === req.classGroup.name
+    );
 
-    const ongoingPage = {
-      isEditable: true,
-      isDeleteable: true,
-      isCreatable: false,
-      span: 2,
-      title: "Các tiết học đang diễn ra",
-      values: ongoingSessions.map((session) => ({
-        id: session._id,
-        "Tiết học": session.title,
-        Ngày: session.startedAt.toISOString().substr(0, 10),
-        "Bắt đầu": session.startedAt.toString().substr(16, 8),
-        "Kết thúc": "Chưa kết thúc",
-      })),
-    };
-
-    const sessionsInClasses = classes.map((cls) => ({
+    const sessionsInClasses = filter.map((cls) => ({
       isEditable: true,
       isDeleteable: true,
       isCreatable: false,
       span: 3,
       title: `${cls.classDetails[0].name} ${cls.classDetails[0].day}(${cls.classDetails[0].startTime}-${cls.classDetails[0].endTime})`,
-      values: cls.sessions.map((session) => ({
-        id: session._id,
-        "Tiết học": session.title,
-        Ngày: session.startedAt.toISOString().substr(0, 10),
-        "Bắt đầu": session.startedAt.toString().substr(16, 8),
-        "Kết thúc": session.endedAt
-          ? session.endedAt.toString().substr(16, 8)
-          : "Chưa kết thúc",
-      })),
+      values: cls.sessions
+        .map((session) => ({
+          id: session._id,
+          "Tiết học": session.title,
+          Ngày: session.startedAt.toISOString().substr(0, 10),
+          "Bắt đầu": session.startedAt.toString().substr(16, 8),
+          "Kết thúc": session.endedAt
+            ? session.endedAt.toString().substr(16, 8)
+            : "Chưa kết thúc",
+        }))
+        .sort((a, b) => a["Bắt đầu"] - b["Bắt đầu"]),
     }));
     // res.json(sessions);
     res.render("readMultiTable", {
       title: "Danh sách tiết học",
-      createPage: "/session/new",
-      updatePage: "/session/edit",
-      deleteRoute: "/session/delete",
+      createPage: `/${req.classGroup._id}/session/new`,
+      updatePage: `/${req.classGroup._id}/session/edit`,
+      deleteRoute: `/${req.classGroup._id}/session/delete`,
       headers: [
-        { name: "Tiết học", detailPage: "/session" },
+        { name: "Tiết học", detailPage: `/${req.classGroup._id}/session` },
         "Ngày",
         "Bắt đầu",
         "Kết thúc",
       ],
-      pages: [ongoingPage, ...sessionsInClasses],
+      pages: sessionsInClasses,
     });
   })
 );
@@ -87,24 +74,25 @@ router.get(
 router.get(
   "/new",
   asyncHandler(async (req, res, next) => {
-    console.log("🚀 ~ asyncHandler ~ res:", res);
-    const classes = await Class.find();
-    console.log("🚀 ~ asyncHandler ~ classes:", classes);
+    const classes = await Class.find({ classGroup: req.classGroup.name });
     res.render("create", {
-      createRoute: "/session",
+      createRoute: `/${req.classGroup._id}/session/new`,
       fields: [
         {
           label: "Lớp học",
+          name: "classId",
           type: "select",
           options: classes.map((cls) => ({ value: cls._id, label: cls.name })),
         },
         {
           label: "Tiêu đề",
+          name: "title",
           type: "text",
           placeholder: "Tiết học",
         },
         {
           label: "Thời gian bắt đầu",
+          name: "startAt",
           type: "datetime-local",
           placeholder: "Bắt đầu",
         },
@@ -126,7 +114,7 @@ router.get(
         "Họ và Tên": sinhvien.sinhvienName,
         "Thời gian tham gia": sinhvien.joinTime.toString().substr(16, 8),
       })),
-      updateRoute: "/session",
+      updateRoute: `/${req.classGroup._id}/session`,
     });
   })
 );
@@ -136,6 +124,7 @@ router.get("/edit/:id", async (req, res) => {
   const sessionToEdit = await Session.findById(id);
   res.render("update", {
     id: sessionToEdit._id,
+    updateRoute: `/${req.classGroup._id}/session/${id}`,
     title: "Chỉnh sửa tiết học",
     fields: [
       {
@@ -161,32 +150,29 @@ router.get("/edit/:id", async (req, res) => {
           : "Chưa kết thúc",
       },
     ],
-    updateRoute: "/session",
   });
 });
 
 router.post(
-  "/",
+  "/new",
   asyncHandler(async (req, res, next) => {
-    const classId = req.body["Lớp học"];
-    const title = req.body["Tiêu đề"];
-    const startedAt = new Date(req.body["Thời gian bắt đầu"]);
-    await Session.create({ classId, title, startedAt });
-    res.redirect("/session");
+    const { classId, title, startAt } = req.body;
+    await Session.create({ classId, title, startedAt: new Date(startAt) });
+    res.redirect(`/${req.classGroup._id}/session`);
   })
 );
 
-router.post("/:id", async (req, res) => {
+router.post("/edit/:id", async (req, res) => {
   const { id } = req.params;
+  console.log(req.body);
   const classId = req.body["Lớp học"];
   const title = req.body["Tiêu đề"];
   const startedAt = new Date(req.body["Thời gian bắt đầu"]);
   const endedAt = req.body["Thời gian kết thúc"]
     ? new Date(req.body["Thời gian kết thúc"])
     : null;
-
   await Session.findByIdAndUpdate(id, { classId, title, startedAt, endedAt });
-  res.redirect("/session");
+  res.redirect(`/${req.classGroup._id}/session`);
 });
 
 router.post(
@@ -194,7 +180,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     await Session.findByIdAndDelete(id);
-    res.redirect("/session");
+    res.redirect(`/${req.classGroup._id}/session`);
   })
 );
 
