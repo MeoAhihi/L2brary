@@ -9,7 +9,7 @@ block content
                 .col 
                     case (field.type)
                         when "select"
-                            select.form-select(name=field.label id=field.label)
+                            select.form-select(aria-label="Chọn ngày học" name=field.name id=field.label)
                                 each option in field.options 
                                     option(value=option.value)= option.label
                         when "checkboxes"
@@ -20,9 +20,9 @@ block content
                         when "radios"
                             each option in field.options 
                                 .form-check
-                                    input.form-check-input(type="radio" name=field.label id=option value=option)
+                                    input.form-check-input(type="radio" name=field.name id=option value=option)
                                     label.form-check-label(for=option)= option
                         default
-                            input.form-control(type=field.type id=field.label name=field.label required=isRequired||false) 
+                            input.form-control(type=field.type id=field.label name=field.name required=isRequired||false) 
         .d-flex.justify-content-end
             button.btn.btn-primary(type="submit") Create #{model}
