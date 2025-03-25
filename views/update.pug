@@ -11,7 +11,7 @@ block content
                         when "select"
                             select.form-select(name=field.name id=field.label)
                                 each option in field.options 
-                                    option(value=option.value selected=option===field.value)= option.label
+                                    option(value=option.value selected=option.value===field.value)= option.label
                         when "checkboxes"
                             each option in field.options 
                                 .form-check
@@ -20,8 +20,8 @@ block content
                         when "radios"
                             each option in field.options 
                                 .form-check
-                                    input.form-check-input(type="radio" name=field.label id=option value=option)
-                                    label.form-check-label(for=option)= option
+                                    input.form-check-input(type="radio" name=field.name id=option.label value=option.value checked=option.value===field.value)
+                                    label.form-check-label(for=option.value)= option.label
                         default
                             input.form-control(type=field.type id=field.label name=field.name value=field.value required=isRequired||false) 
         .d-flex.justify-content-end

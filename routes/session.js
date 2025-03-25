@@ -35,14 +35,16 @@ router.get(
     const filter = classes.filter(
       (cls) => cls.classDetails[0].classGroup === req.classGroup.name
     );
+    const now = new Date();
 
     const sessionsInClasses = filter.map((cls) => ({
       isEditable: true,
       isDeleteable: true,
       isCreatable: false,
       span: 3,
-      title: `${cls.classDetails[0].name} ${cls.classDetails[0].day}(${cls.classDetails[0].startTime}-${cls.classDetails[0].endTime})`,
+      title: `${cls.classDetails[0].name} ${cls.classDetails[0].day} (${cls.classDetails[0].startTime}-${cls.classDetails[0].endTime})`,
       values: cls.sessions
+        .sort((a, b) => b.startedAt - a.startedAt)
         .map((session) => ({
           id: session._id,
           "Tiết học": session.title,
@@ -51,8 +53,7 @@ router.get(
           "Kết thúc": session.endedAt
             ? session.endedAt.toString().substr(16, 8)
             : "Chưa kết thúc",
-        }))
-        .sort((a, b) => a["Bắt đầu"] - b["Bắt đầu"]),
+        })),
     }));
     // res.json(sessions);
     res.render("readMultiTable", {
@@ -61,7 +62,7 @@ router.get(
       updatePage: `/${req.classGroup._id}/session/edit`,
       deleteRoute: `/${req.classGroup._id}/session/delete`,
       headers: [
-        { name: "Tiết học", detailPage: `/${req.classGroup._id}/session` },
+        { name: "Tiết học", detailPage: `/${req.classGroup._id}/session/` },
         "Ngày",
         "Bắt đầu",
         "Kết thúc",
@@ -107,6 +108,8 @@ router.get(
     const { id } = req.params;
     const session = await Session.findById(id).populate("classId");
     res.render("sessionAttendance", {
+      isDeleteable: false,
+      span: 0,
       title: `${session.title} (${session.classId.name})`,
       id: session._id,
       headers: ["Họ và Tên", "Thời gian tham gia"],
@@ -114,44 +117,47 @@ router.get(
         "Họ và Tên": sinhvien.sinhvienName,
         "Thời gian tham gia": sinhvien.joinTime.toString().substr(16, 8),
       })),
-      updateRoute: `/${req.classGroup._id}/session`,
+      deleteRoute: `/${req.classGroup._id}/session/delete`,
     });
   })
 );
 
-router.get("/edit/:id", async (req, res) => {
-  const { id } = req.params;
-  const sessionToEdit = await Session.findById(id);
-  res.render("update", {
-    id: sessionToEdit._id,
-    updateRoute: `/${req.classGroup._id}/session/${id}`,
-    title: "Chỉnh sửa tiết học",
-    fields: [
-      {
-        label: "Lớp học",
-        type: "text",
-        value: sessionToEdit.classId,
-      },
-      {
-        label: "Tiêu đề",
-        type: "text",
-        value: sessionToEdit.title,
-      },
-      {
-        label: "Thời gian bắt đầu",
-        type: "datetime-local",
-        value: sessionToEdit.startedAt.toISOString().substr(0, 16),
-      },
-      {
-        label: "Thời gian kết thúc",
-        type: "datetime-local",
-        value: sessionToEdit.endedAt
-          ? sessionToEdit.endedAt.toISOString().substr(0, 16)
-          : "Chưa kết thúc",
-      },
-    ],
-  });
-});
+router.get(
+  "/edit/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const sessionToEdit = await Session.findById(id);
+    res.render("update", {
+      id: sessionToEdit._id,
+      updateRoute: `/${req.classGroup._id}/session/${id}`,
+      title: "Chỉnh sửa tiết học",
+      fields: [
+        {
+          label: "Lớp học",
+          type: "text",
+          value: sessionToEdit.classId,
+        },
+        {
+          label: "Tiêu đề",
+          type: "text",
+          value: sessionToEdit.title,
+        },
+        {
+          label: "Thời gian bắt đầu",
+          type: "datetime-local",
+          value: sessionToEdit.startedAt.toISOString().substr(0, 16),
+        },
+        {
+          label: "Thời gian kết thúc",
+          type: "datetime-local",
+          value: sessionToEdit.endedAt
+            ? sessionToEdit.endedAt.toISOString().substr(0, 16)
+            : "Chưa kết thúc",
+        },
+      ],
+    });
+  })
+);
 
 router.post(
   "/new",
@@ -162,18 +168,21 @@ router.post(
   })
 );
 
-router.post("/edit/:id", async (req, res) => {
-  const { id } = req.params;
-  console.log(req.body);
-  const classId = req.body["Lớp học"];
-  const title = req.body["Tiêu đề"];
-  const startedAt = new Date(req.body["Thời gian bắt đầu"]);
-  const endedAt = req.body["Thời gian kết thúc"]
-    ? new Date(req.body["Thời gian kết thúc"])
-    : null;
-  await Session.findByIdAndUpdate(id, { classId, title, startedAt, endedAt });
-  res.redirect(`/${req.classGroup._id}/session`);
-});
+router.post(
+  "/edit/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    console.log(req.body);
+    const classId = req.body["Lớp học"];
+    const title = req.body["Tiêu đề"];
+    const startedAt = new Date(req.body["Thời gian bắt đầu"]);
+    const endedAt = req.body["Thời gian kết thúc"]
+      ? new Date(req.body["Thời gian kết thúc"])
+      : null;
+    await Session.findByIdAndUpdate(id, { classId, title, startedAt, endedAt });
+    res.redirect(`/${req.classGroup._id}/session`);
+  })
+);
 
 router.post(
   "/delete/:id",

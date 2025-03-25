@@ -20,8 +20,8 @@ block content
                         when "radios"
                             each option in field.options 
                                 .form-check
-                                    input.form-check-input(type="radio" name=field.name id=option value=option)
-                                    label.form-check-label(for=option)= option
+                                    input.form-check-input(type="radio" name=field.name id=option.label value=option.value)
+                                    label.form-check-label(for=option.value)= option.label
                         default
                             input.form-control(type=field.type id=field.label name=field.name required=isRequired||false) 
         .d-flex.justify-content-end

@@ -3,6 +3,7 @@ const SinhVien = require("../models/SinhVien");
 const Attendance = require("../models/Attendance");
 const Class = require("../models/Class");
 const Session = require("../models/Session");
+const expressAsyncHandler = require("express-async-handler");
 
 const router = express.Router();
 
@@ -66,19 +67,30 @@ router.get("/", async (req, res) => {
   });
 });
 
-router.get("/confirm", async (req, res) => {
-  const { sessionId, sinhvienId } = req.query;
+router.get(
+  "/confirm",
+  expressAsyncHandler(async (req, res) => {
+    const { sessionId, sinhvienId, submitTime = new Date() } = req.query;
 
-  const sinhvien = await SinhVien.findById(sinhvienId);
-  const session = await Session.findById(sessionId);
-  const classInfo = await Class.findById(session.classId);
-  res.render("confirm", {
-    name: sinhvien.fullName,
-    sessionId,
-    className: classInfo.name,
-    sinhvienId,
-  });
-});
+    // const sinhvien = await SinhVien.findById(sinhvienId);
+    // const session = await Session.findById(sessionId);
+    // const classInfo = await Class.findById(session.classId);
+    const session = await Session.findById(sessionId);
+
+    const sinhvien = await SinhVien.findById(sinhvienId);
+
+    session.attendance.push({
+      sinhvienId: sinhvienId,
+      sinhvienName: sinhvien.fullName,
+      joinTime: submitTime,
+    });
+    // Add attendance to the session
+    await session.save();
+
+    // Add your attendance recording logic here
+    res.redirect(`/${req.classGroup._id}/session/${sessionId}`);
+  })
+);
 
 router.get("/statistic", async (req, res) => {
   const { classId } = req.query;

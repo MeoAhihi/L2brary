@@ -15,7 +15,7 @@ const scoreSchema = new mongoose.Schema({
   score: {
     type: Number,
     required: true,
-    },
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -39,87 +39,93 @@ router.get(
   })
 );
 
-router.get("/new", (req, res) => {
-  res.render("create", {
-    createRoute: `/${req.classGroup._id}/class/new`,
-    fields: [
-      {
-        label: "Tên Lớp",
-        name: "name",
-        type: "text",
-      },
-      {
-        label: "Ngày học",
-        name: "day",
-        type: "select",
-        options: [
-          "Thứ 2",
-          "Thứ 3",
-          "Thứ 4",
-          "Thứ 5",
-          "Thứ 6",
-          "Thứ 7",
-          "Chủ Nhật",
-        ].map((day) => ({ value: day, label: day })),
-      },
-      {
-        label: "Giờ Bắt Đầu",
-        name: "startTime",
-        type: "time",
-      },
-      {
-        label: "Giờ Kết Thúc",
-        name: "endTime",
-        type: "time",
-      },
-    ],
-  });
-});
+router.get(
+  "/new",
+  expressAsyncHandler(async (req, res) => {
+    res.render("create", {
+      createRoute: `/${req.classGroup._id}/class/new`,
+      fields: [
+        {
+          label: "Tên Lớp",
+          name: "name",
+          type: "text",
+        },
+        {
+          label: "Ngày học",
+          name: "day",
+          type: "select",
+          options: [
+            "Thứ 2",
+            "Thứ 3",
+            "Thứ 4",
+            "Thứ 5",
+            "Thứ 6",
+            "Thứ 7",
+            "Chủ Nhật",
+          ].map((day) => ({ value: day, label: day })),
+        },
+        {
+          label: "Giờ Bắt Đầu",
+          name: "startTime",
+          type: "time",
+        },
+        {
+          label: "Giờ Kết Thúc",
+          name: "endTime",
+          type: "time",
+        },
+      ],
+    });
+  })
+);
 
-router.get("/edit/:id", async (req, res) => {
-  const { id } = req.params;
-  const classToEdit = await Class.findById(id);
-  res.render("update", {
-    id: classToEdit._id,
-    updateRoute: `/${req.classGroup._id}/session/${id}`,
-    title: "Chỉnh sửa lớp học",
-    fields: [
-      {
-        label: "Tên Lớp",
-        name: "name",
-        type: "text",
-        value: classToEdit.name,
-      },
-      {
-        label: "Ngày học",
-        name: "day",
-        value: classToEdit.day,
-        type: "select",
-        options: [
-          "Thứ 2",
-          "Thứ 3",
-          "Thứ 4",
-          "Thứ 5",
-          "Thứ 6",
-          "Thứ 7",
-          "Chủ Nhật",
-        ].map((day) => ({ value: day, label: day })),
-      },
-      {
-        label: "Giờ Bắt Đầu",
-        name: "startTime",
-        type: "time",
-        value: classToEdit.startTime,
-      },
-      {
-        label: "Giờ Kết Thúc",
-        name: "endTime",
-        type: "time",
-        value: classToEdit.endTime,
-      },
-    ],
-  });
-});
+router.get(
+  "/edit/:id",
+  expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const classToEdit = await Class.findById(id);
+    res.render("update", {
+      id: classToEdit._id,
+      updateRoute: `/${req.classGroup._id}/session/${id}`,
+      title: "Chỉnh sửa lớp học",
+      fields: [
+        {
+          label: "Tên Lớp",
+          name: "name",
+          type: "text",
+          value: classToEdit.name,
+        },
+        {
+          label: "Ngày học",
+          name: "day",
+          value: classToEdit.day,
+          type: "select",
+          options: [
+            "Thứ 2",
+            "Thứ 3",
+            "Thứ 4",
+            "Thứ 5",
+            "Thứ 6",
+            "Thứ 7",
+            "Chủ Nhật",
+          ].map((day) => ({ value: day, label: day })),
+        },
+        {
+          label: "Giờ Bắt Đầu",
+          name: "startTime",
+          type: "time",
+          value: classToEdit.startTime,
+        },
+        {
+          label: "Giờ Kết Thúc",
+          name: "endTime",
+          type: "time",
+          value: classToEdit.endTime,
+        },
+      ],
+    });
+  })
+);
 
 router.post(
   "/new",
@@ -138,23 +144,29 @@ router.post(
   })
 );
 
-router.post("/edit/:id", async (req, res) => {
-  const { id } = req.params;
-  const { name, day, startTime, endTime } = req.body;
-  await Class.findByIdAndUpdate(id, {
-    name,
-    day,
-    startTime,
-    endTime,
-  });
-  res.redirect("..");
-});
+router.post(
+  "/edit/:id",
+  expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { name, day, startTime, endTime } = req.body;
+    await Class.findByIdAndUpdate(id, {
+      name,
+      day,
+      startTime,
+      endTime,
+    });
+    res.redirect("..");
+  })
+);
 
-router.post("/delete/:id", async (req, res) => {
-  const { id } = req.params;
+router.post(
+  "/delete/:id",
+  expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
 
-  await Class.findByIdAndDelete(id);
-  res.redirect("..");
-});
+    await Class.findByIdAndDelete(id);
+    res.redirect("..");
+  })
+);
 
 module.exports = router;
