@@ -48,13 +48,21 @@ router.get(
   "/",
   expressAsyncHandler(async (req, res) => {
     const { fullName } = req.query;
-    const sinhviens = await SinhVien.find(
+    const sinhviens = await SinhVien.aggregate([
       {
-        fullName: toVietnameseRegex(fullName),
+        $match: {
+          fullName: toVietnameseRegex(fullName),
+        },
       },
-      null,
-      { sort: { group: 1, fullName: 1 } }
-    );
+      {
+        $addFields: {
+          lastName: { $arrayElemAt: [{ $split: ["$fullName", " "] }, -1] },
+        },
+      },
+      {
+        $sort: { group: 1, lastName: 1 },
+      },
+    ]);
     res.render("read", {
       title: "Sinh viên",
       createPage: `/sinhvien/new`,
