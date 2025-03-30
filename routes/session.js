@@ -1,11 +1,40 @@
 const express = require("express");
 const router = express.Router();
 const asyncHandler = require("express-async-handler");
+const { toVietnameseRegex } = require("../utils/vietnamese");
 
-const mongoose = require("mongoose");
 const Session = require("../models/Session");
 const Class = require("../models/Class");
-const Attendance = require("../models/Attendance");
+const SinhVien = require("../models/SinhVien");
+
+router.get(
+  "/export",
+  asyncHandler(async (req, res) => {
+    const classes = await Session.aggregate([
+      {
+        $group: {
+          _id: "$classId",
+          sessions: { $push: "$$ROOT" },
+        },
+      },
+      {
+        $addFields: {
+          _id: { $toObjectId: "$_id" },
+        },
+      },
+      {
+        $lookup: {
+          from: "classes",
+          localField: "_id",
+          foreignField: "_id",
+          as: "classDetails",
+        },
+      },
+    ]);
+
+    res.json(classes);
+  })
+);
 
 router.get(
   "/",
@@ -107,7 +136,19 @@ router.get(
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const session = await Session.findById(id).populate("classId");
+    const sinhviens = await SinhVien.aggregate([
+      {
+        $addFields: {
+          lastName: { $arrayElemAt: [{ $split: ["$fullName", " "] }, -1] },
+        },
+      },
+      {
+        $sort: { lastName: 1 },
+      },
+    ]);
+
     res.render("sessionAttendance", {
+      sinhviens,
       isDeleteable: false,
       span: 0,
       title: `${session.title} (${session.classId.name})`,

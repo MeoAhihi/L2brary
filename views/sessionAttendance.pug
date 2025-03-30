@@ -1,10 +1,69 @@
 extends read 
 
 block tableHeader 
+    .row
+        .col
+            h1 QR Check in 
 
-    h1 QR Check in 
+            script(src="/javascripts/html5-qrcode.min.js") 
+            div(id="reader" style="width:500px;height:500px;border:1px solid #000;")   
+            script(src="/javascripts/qr-scanner-handler copy.js")
+            script.
+                function submitForm() {
+                    // Get all selected checkboxes
+                    const checkboxes = document.querySelectorAll('input[name="options"]:checked');
+                    const sinhvienIds = Array.from(checkboxes).map(cb => cb.value);
 
-    script(src="/javascripts/html5-qrcode.min.js") 
-    div(id="reader" style="width:500px;height:500px;border:1px solid #000;")   
-    script(src="/javascripts/qr-scanner-handler copy.js") 
+                    // Get joinTime from the form
+                    const joinTime = document.getElementById('joinTime').value;
+
+                    const url = window.location.pathname.split("/");
+                    // Handle on success condition with the decoded text or result.
+                    const classGroupId = url[1];
+                    const sessionId = url[3];
+
+                    // Prepare data for submission
+                    const data = {
+                        sessionId,
+                        joinTime,
+                        sinhvienIds
+                    };
+
+                    // Submit data to POST /attendance/
+                    fetch(`/${classGroupId}/attendance/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        location.reload();  
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting attendance.');
+                    });
+                }
+
+        .col
+            h1.mb-5 Biểu mẫu điểm danh
+            form.d-flex.flex-column.gap-4
+                .form-group.row
+                    .col-12.col-md-4
+                        label Sinh vien:
+                    .col-12.col-md
+                        div.overflow-auto(style="height:400px; border: 1px solid #ccc;")
+                            each sv in sinhviens
+                                .form-check.m-2
+                                    input.form-check-input(type="checkbox" name="options" value=sv._id id=sv._id)
+                                    label.form-check-label(for=sv._id)= sv.fullName
+                .form-group.row
+                    .col-12.col-md-4
+                        label Thời gian điểm danh: 
+                    .col-12.col-md
+                        input.form-control(type="datetime-local" name="joinTime" id="joinTime")
+                button.btn.btn-primary(type="button" onclick="submitForm()") Điểm danh
+
     h1 Điểm danh
+

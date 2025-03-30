@@ -158,8 +158,10 @@ router.get("/statistic", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { sinhvienIds, sessionId, submitTime = new Date() } = req.body;
-
     const session = await Session.findById(sessionId);
+    const sinhviens = await SinhVien.find({ _id: { $in: sinhvienIds } });
+
+    console.log("🚀 ~ router.post ~ sinhviens:", sinhviens);
 
     async function addToAttendance(id) {
       const sinhvien = await SinhVien.findById(id);
@@ -170,17 +172,22 @@ router.post("/", async (req, res) => {
         joinTime: submitTime,
       });
     }
-    console.log(sinhvienIds, sessionId, submitTime);
     if (sinhvienIds instanceof Array) {
-      await Promise.all(sinhvienIds.forEach(addToAttendance));
+      const data = sinhvienIds.map((id) => ({
+        sinhvienId: id,
+        sinhvienName: sinhviens.find((sv) => sv._id == id).fullName,
+        joinTime: submitTime,
+      }));
+      session.attendance.push(...data);
     } else {
       await addToAttendance(sinhvienIds);
     }
+
     // Add attendance to the session
     await session.save();
 
     // Add your attendance recording logic here
-    res.redirect("/session/" + sessionId);
+    res.redirect(`${req.classGroup._id}/session/${sessionId}`);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

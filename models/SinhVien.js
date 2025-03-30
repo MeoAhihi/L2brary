@@ -13,6 +13,15 @@ const SinhVienSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
+  phoneNumber: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
+  joinDate: {
+    type: Date,
+  },
   group: {
     type: String,
     required: true,

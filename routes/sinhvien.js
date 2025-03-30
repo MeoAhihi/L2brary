@@ -2,6 +2,7 @@ const express = require("express");
 const SinhVien = require("../models/SinhVien");
 const { toVietnameseRegex } = require("../utils/vietnamese");
 const expressAsyncHandler = require("express-async-handler");
+const ExcelJS = require("exceljs"); // Add this at the top of the file
 
 const router = express.Router();
 
@@ -76,6 +77,9 @@ router.get(
         "Họ và Tên",
         "Ngày sinh",
         "Giới tính",
+        "SĐT",
+        "Email",
+        "Ngày CĐ",
         "Tổ",
         { name: "Mã QR", detailPage: "/sinhvien/qr?id=" },
       ],
@@ -84,6 +88,9 @@ router.get(
         "Họ và Tên": sv.fullName,
         "Ngày sinh": sv.birthday.toISOString().split("T")[0],
         "Giới tính": sv.isMale ? "Nam" : "Nữ",
+        SĐT: sv.phoneNumber,
+        Email: sv.email,
+        "Ngày CĐ": sv.joinDate?.toISOString().split("T")[0],
         Tổ: sv.group,
         "Mã QR": "Xem",
       })),
@@ -121,6 +128,21 @@ router.get(
               value: "false",
             },
           ],
+        },
+        {
+          label: "SĐT",
+          name: "phoneNumber",
+          type: "text",
+        },
+        {
+          label: "Email",
+          name: "email",
+          type: "text",
+        },
+        {
+          label: "Ngày CĐ",
+          name: "joinDate",
+          type: "date",
         },
         {
           label: "Tổ",
@@ -196,6 +218,24 @@ router.get(
           value: sinhVien.isMale ? "true" : "false",
         },
         {
+          label: "SĐT",
+          name: "phoneNumber",
+          type: "text",
+          value: sinhVien.phoneNumber,
+        },
+        {
+          label: "Email",
+          name: "email",
+          type: "text",
+          value: sinhVien.email,
+        },
+        {
+          label: "Ngày CĐ",
+          name: "joinDate",
+          type: "date",
+          value: formatDate(sinhVien.joinDate),
+        },
+        {
           label: "Tổ",
           name: "group",
           type: "select",
@@ -238,13 +278,25 @@ router.post(
   "/edit/:id",
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { fullName, birthday, isMale, group, status } = req.body;
+    const {
+      fullName,
+      birthday,
+      isMale,
+      phoneNumber,
+      email,
+      joinDate,
+      group,
+      status,
+    } = req.body;
     const newSinhVien = await SinhVien.findByIdAndUpdate(
       id,
       {
         fullName,
         birthday: new Date(birthday),
         isMale,
+        phoneNumber,
+        email,
+        joinDate: new Date(joinDate),
         group,
         status,
       },
@@ -261,6 +313,53 @@ router.post(
   expressAsyncHandler(async (req, res) => {
     await SinhVien.findByIdAndDelete(req.params.id);
     res.redirect("/sinhvien");
+  })
+);
+
+router.get(
+  "/export",
+  expressAsyncHandler(async (req, res) => {
+    const sinhviens = await SinhVien.find();
+
+    // Create a new workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Sinh Viên");
+
+    // Add headers
+    worksheet.columns = [
+      { header: "stt", key: "index", width: 10 },
+      { header: "Mã hệ thống", key: "_id", width: 10 },
+      { header: "Họ và Tên", key: "fullName", width: 30 },
+      { header: "Ngày sinh", key: "birthday", width: 15 },
+      { header: "C/K", key: "isMale", width: 10 },
+      { header: "Tổ", key: "group", width: 10 },
+    ];
+
+    // Add rows
+    sinhviens.forEach((sv, index) => {
+      worksheet.addRow({
+        index: index + 1,
+        _id: sv._id,
+        fullName: sv.fullName,
+        birthday: sv.birthday,
+        isMale: sv.isMale ? "Càn" : "Khôn",
+        group: sv.group,
+      });
+    });
+
+    // Set response headers for file download
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=SinhVienData.xlsx"
+    );
+
+    // Write the workbook to the response
+    await workbook.xlsx.write(res);
+    res.end();
   })
 );
 

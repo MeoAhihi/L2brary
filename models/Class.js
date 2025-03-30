@@ -17,6 +17,21 @@ const classSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  students: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SinhVien",
+      studentName: {
+        type: String,
+      },
+      group: {
+        type: String,
+      },
+      position: {
+        type: String,
+      },
+    },
+  ],
   classGroup: {
     type: String,
     required: true,

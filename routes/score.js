@@ -117,26 +117,10 @@ router.get(
   })
 );
 
-function lastname(sv) {
-  return sv.fullName.split(" ").at(-1);
-}
-
 router.get(
   "/new",
   expressAsyncHandler(async (req, res) => {
-    const sinhviens = await SinhVien.aggregate([
-      {
-        $addFields: {
-          lastName: { $arrayElemAt: [{ $split: ["$fullName", " "] }, -1] },
-        },
-      },
-      {
-        $sort: {
-          lastName: 1,
-        },
-      },
-    ]);
-    
+    const sinhviens = await SinhVien.find();
     const skills = await Skill.find({ classGroup: req.classGroup.name });
     res.render("create", {
       title: "Create Score",

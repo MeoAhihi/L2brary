@@ -11,6 +11,7 @@ const ClassGroup = require("./models/ClassGroup");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const sinhvienRouter = require("./routes/sinhvien");
+const exportRouter = require("./routes/export");
 const attendanceRouter = require("./routes/attendance");
 const classRouter = require("./routes/class");
 const skillRouter = require("./routes/skill");
@@ -42,6 +43,7 @@ const classGroupMiddleware = expressAsyncHandler(async (req, res, next) => {
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/sinhvien", sinhvienRouter);
+app.use("/export", exportRouter);
 app.use("/:classGroupId/attendance", classGroupMiddleware, attendanceRouter);
 app.use("/:classGroupId/class", classGroupMiddleware, classRouter);
 app.use("/:classGroupId/skill", classGroupMiddleware, skillRouter);
