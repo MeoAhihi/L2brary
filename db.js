@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 
 const dbURI = process.env.MONGODB_DB_URI;
+const dbName = process.env.MONGODB_DB_NAME || "L2brary-demo"; 
 
 mongoose
-  .connect(dbURI, { dbName: "L2brary" })
+  .connect(dbURI, { dbName: dbName })
   .then(() => console.log("Database connected successfully"))
   .catch((err) => console.log("Database connection error: ", err));
 
