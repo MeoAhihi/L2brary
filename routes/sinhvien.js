@@ -75,12 +75,12 @@ router.get(
       span: 2,
       headers: [
         "Họ và Tên",
+        "Tổ",
         "Ngày sinh",
         "Giới tính",
         "SĐT",
         "Email",
-        "Ngày CĐ",
-        "Tổ",
+        "Ngày TG",
         { name: "Mã QR", detailPage: "/sinhvien/qr?id=" },
       ],
       values: sinhviens.map((sv) => ({

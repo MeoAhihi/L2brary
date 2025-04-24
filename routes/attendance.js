@@ -160,8 +160,7 @@ router.post("/", async (req, res) => {
     const { sinhvienIds, sessionId, submitTime = new Date() } = req.body;
     const session = await Session.findById(sessionId);
     const sinhviens = await SinhVien.find({ _id: { $in: sinhvienIds } });
-
-    console.log("🚀 ~ router.post ~ sinhviens:", sinhviens);
+    submitTime = submitTime == "" ? new Date() : submitTime;  
 
     async function addToAttendance(id) {
       const sinhvien = await SinhVien.findById(id);
