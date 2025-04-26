@@ -168,31 +168,40 @@ router.get(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const sessionToEdit = await Session.findById(id);
+    
     res.render("update", {
       id: sessionToEdit._id,
-      updateRoute: `/${req.classGroup._id}/session/${id}`,
+      updateRoute: `/${req.classGroup._id}/session/edit/${id}`,
       title: "Chỉnh sửa tiết học",
       fields: [
         {
-          label: "Lớp học",
-          type: "text",
-          value: sessionToEdit.classId,
-        },
-        {
           label: "Tiêu đề",
+          name: "title",
           type: "text",
           value: sessionToEdit.title,
         },
         {
           label: "Thời gian bắt đầu",
+          name: "startedAt",
           type: "datetime-local",
-          value: sessionToEdit.startedAt.toISOString().substr(0, 16),
+          value: new Date(
+            sessionToEdit.startedAt.getTime() -
+              sessionToEdit.startedAt.getTimezoneOffset() * 60000
+          )
+            .toISOString()
+            .slice(0, 16),
         },
         {
           label: "Thời gian kết thúc",
+          name: "endedAt",
           type: "datetime-local",
           value: sessionToEdit.endedAt
-            ? sessionToEdit.endedAt.toISOString().substr(0, 16)
+            ? new Date(
+                sessionToEdit.endedAt.getTime() -
+                  sessionToEdit.endedAt.getTimezoneOffset() * 60000
+              )
+                .toISOString()
+                .slice(0, 16)
             : "Chưa kết thúc",
         },
       ],
@@ -213,14 +222,13 @@ router.post(
   "/edit/:id",
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log(req.body);
-    const classId = req.body["Lớp học"];
-    const title = req.body["Tiêu đề"];
-    const startedAt = new Date(req.body["Thời gian bắt đầu"]);
-    const endedAt = req.body["Thời gian kết thúc"]
-      ? new Date(req.body["Thời gian kết thúc"])
-      : null;
-    await Session.findByIdAndUpdate(id, { classId, title, startedAt, endedAt });
+    const { title, startedAt, endedAt } = req.body;
+    const data = {
+      title,
+      startedAt: new Date(startedAt),
+      endedAt: endedAt ? new Date(endedAt) : null,
+    };
+    await Session.findByIdAndUpdate(id, data);
     res.redirect(`/${req.classGroup._id}/session`);
   })
 );

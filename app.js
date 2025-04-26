@@ -17,6 +17,7 @@ const classRouter = require("./routes/class");
 const skillRouter = require("./routes/skill");
 const scoreRouter = require("./routes/score");
 const sessionRouter = require("./routes/session");
+const reportRouter = require("./routes/report");
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/sinhvien", sinhvienRouter);
 app.use("/export", exportRouter);
+app.use("/report", reportRouter);
 app.use("/:classGroupId/attendance", classGroupMiddleware, attendanceRouter);
 app.use("/:classGroupId/class", classGroupMiddleware, classRouter);
 app.use("/:classGroupId/skill", classGroupMiddleware, skillRouter);

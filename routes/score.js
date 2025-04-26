@@ -59,7 +59,8 @@ router.get(
         },
       },
     ]);
-    res.render("readMultiTable", {
+    res.render("readScore", {
+      classGroup: req.classGroup,
       title: "Điểm số",
       headers: ["Kỹ năng", "Điểm số"],
       pages: sinhviens.map((sinhvien) => ({
@@ -79,45 +80,6 @@ router.get(
 );
 
 router.get(
-  "/history",
-  expressAsyncHandler(async (req, res) => {
-    const { scoreName } = req.query;
-    const scores = await Score.aggregate([
-      {
-        $lookup: {
-          from: "sinhviens",
-          localField: "sinhVien",
-          foreignField: "_id",
-          as: "sinhVien",
-        },
-      },
-      {
-        $lookup: {
-          from: "skills",
-          localField: "skill",
-          foreignField: "_id",
-          as: "skillInfo",
-        },
-      },
-    ]);
-    res.render("read", {
-      title: "Lịch sử điểm số",
-      headers: ["Họ và Tên", "Kỹ năng", "Điểm số", "Thời điểm"],
-      values: scores.map((score) => ({
-        id: score._id,
-        "Họ và Tên": score.sinhVien[0].fullName,
-        "Kỹ năng": score.skillInfo[0]?.name,
-        "Điểm số": score.score,
-        "Thời điểm": score.createdAt,
-      })),
-      createPage: "/score/new",
-      updatePage: "/score/edit",
-      deleteRoute: "/score/delete",
-    });
-  })
-);
-
-router.get(
   "/new",
   expressAsyncHandler(async (req, res) => {
     const sinhviens = await SinhVien.find();
@@ -128,15 +90,25 @@ router.get(
       fields: [
         {
           label: "SinhVien",
+          name: "sinhVien",
           type: "select",
           value: "#value-select",
-          options: sinhviens.map((sv) => ({
-            label: sv.fullName,
-            value: sv._id,
-          })),
+          options: sinhviens
+            .map((sv) => ({
+              lastName:
+                sv.fullName.split(" ")[sv.fullName.split(" ").length - 1],
+              fullName: sv.fullName,
+              value: sv._id,
+            }))
+            .sort((a, b) => a.lastName.localeCompare(b.lastName))
+            .map((sv) => ({
+              label: `[${sv.lastName}] ${sv.fullName}`,
+              value: sv.value,
+            })),
         },
         {
           label: "Skill",
+          name: "skill",
           type: "select",
           value: "#value-select",
           options: skills.map((skill) => ({
@@ -144,7 +116,11 @@ router.get(
             value: skill._id,
           })),
         },
-        { label: "Score", type: "number" },
+        {
+          label: "Score",
+          name: "score",
+          type: "number",
+        },
       ],
     });
   })
@@ -184,13 +160,13 @@ router.post(
     console.log("🚀 ~ router.post ~ req:", req.body);
 
     const newScore = new Score({
-      sinhVien: req.body.SinhVien,
-      skill: req.body.Skill,
-      score: req.body.Score,
+      sinhVien: req.body.sinhVien,
+      skill: req.body.skill,
+      score: req.body.score,
       createdAt: new Date(),
     });
     await newScore.save();
-    res.redirect("/score");
+    res.redirect(`/${req.classGroup._id}/score`);
   })
 );
 
@@ -199,7 +175,7 @@ router.post(
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
     await Score.findByIdAndUpdate(id, { score: req.body.Score });
-    res.redirect("/score");
+    res.redirect(`/${req.classGroup._id}/score`);
   })
 );
 
@@ -208,7 +184,7 @@ router.post(
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
     await Score.findByIdAndDelete(id);
-    res.redirect("/score");
+    res.redirect(`/${req.classGroup._id}/score`);
   })
 );
 
