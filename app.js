@@ -17,6 +17,7 @@ const classRouter = require("./routes/class");
 const skillRouter = require("./routes/skill");
 const scoreRouter = require("./routes/score");
 const sessionRouter = require("./routes/session");
+const actionRouter = require("./routes/action");
 const reportRouter = require("./routes/report");
 
 const app = express();
@@ -51,6 +52,7 @@ app.use("/:classGroupId/class", classGroupMiddleware, classRouter);
 app.use("/:classGroupId/skill", classGroupMiddleware, skillRouter);
 app.use("/:classGroupId/score", classGroupMiddleware, scoreRouter);
 app.use("/:classGroupId/session", classGroupMiddleware, sessionRouter);
+app.use("/:classGroupId/action", classGroupMiddleware, actionRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
