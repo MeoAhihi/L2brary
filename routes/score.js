@@ -82,7 +82,6 @@ router.get(
 router.get(
   "/new",
   expressAsyncHandler(async (req, res) => {
-    const sinhviens = await SinhVien.find();
     const skills = await Skill.find({ classGroup: req.classGroup.name });
     res.render("create", {
       title: "Create Score",
@@ -93,18 +92,12 @@ router.get(
           name: "sinhVien",
           type: "select",
           value: "#value-select",
-          options: sinhviens
-            .map((sv) => ({
-              lastName:
-                sv.fullName.split(" ")[sv.fullName.split(" ").length - 1],
-              fullName: sv.fullName,
+          options: (await SinhVien.getSinhVienFullnameWithSortedLastName()).map(
+            (sv) => ({
               value: sv._id,
-            }))
-            .sort((a, b) => a.lastName.localeCompare(b.lastName))
-            .map((sv) => ({
               label: `[${sv.lastName}] ${sv.fullName}`,
-              value: sv.value,
-            })),
+            })
+          ),
         },
         {
           label: "Skill",
