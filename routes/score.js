@@ -10,7 +10,6 @@ const router = express.Router();
 router.get(
   "/",
   expressAsyncHandler(async (req, res) => {
-    const { scoreName } = req.query;
     const sinhviens = await Score.aggregate([
       {
         $group: {
@@ -58,20 +57,25 @@ router.get(
           as: "sinhVien",
         },
       },
+      {
+        $unwind: "$sinhVien",
+      },
     ]);
+
+    const skills = await Skill.find({ classGroup: req.classGroup.name });
     res.render("readScore", {
       classGroup: req.classGroup,
       title: "Điểm số",
-      headers: ["Kỹ năng", "Điểm số"],
-      pages: sinhviens.map((sinhvien) => ({
-        span: 0,
-        title: sinhvien.sinhVien[0].fullName,
-        values: sinhvien.scores.map((score) => ({
-          id: score._id,
-          "Kỹ năng": score.skill.name,
-          "Điểm số": score.score,
-        })),
+      headers: ["Họ và Tên", ...skills.map((skill) => skill.name)],
+      values: sinhviens.map((sinhvien) => ({
+        id: sinhvien._id,
+        "Họ và Tên": sinhvien.sinhVien.fullName,
+        ...sinhvien.scores.reduce((acc, cur) => {
+          acc[cur.skill.name] = cur.score;
+          return acc;
+        }, {}),
       })),
+      span: 0,
       createPage: `/${req.classGroup._id}/score/new`,
       updatePage: `/${req.classGroup._id}/score/edit`,
       deleteRoute: `/${req.classGroup._id}/score/delete`,

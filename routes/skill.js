@@ -23,9 +23,10 @@ router.get(
       isDeleteable: true,
       isCreatable: false,
       span: 2,
-      headers: ["Tên kỹ năng"],
+      headers: ["Phân loại", "Tên kỹ năng"],
       values: skills.map((skill) => ({
         id: skill._id,
+        "Phân loại": skill.category,
         "Tên kỹ năng": skill.name,
       })),
     });
@@ -35,9 +36,28 @@ router.get(
 router.get(
   "/new",
   expressAsyncHandler(async (req, res) => {
+    const categories = await Skill.getCategories(req.classGroup.name);
     res.render("create", {
       createRoute: `/${req.classGroup._id}/skill/new`,
       fields: [
+        {
+          label: "Phân loại",
+          name: "category",
+          type: "select",
+          options: [
+            { label: "-Trống-", value: "####0000" },
+            ...categories.map((category) => ({
+              label: category,
+              value: category,
+            })),
+            { label: "Khác", value: "other" },
+          ],
+        },
+        {
+          label: "Phân loại khác",
+          name: "categoryOther",
+          type: "text",
+        },
         {
           label: "Tên",
           name: "name",
@@ -53,14 +73,36 @@ router.get(
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
     const skillToEdit = await Skill.findById(id);
+
     res.render("update", {
       id: skillToEdit._id,
       updateRoute: `/${req.classGroup._id}/skill/edit/${id}`,
       title: "Chỉnh sửa Kỹ năng",
       fields: [
         {
+          label: "Phân loại",
+          name: "category",
+          type: "select",
+          options: [
+            { label: "-Trống-", value: null },
+            ...(await Skill.getCategories(req.classGroup.name)).map(
+              (category) => ({
+                label: category,
+                value: category,
+              })
+            ),
+            { label: "Khác", value: "other" },
+          ],
+        },
+        {
+          label: "Phân loại khác",
+          name: "categoryOther",
+          type: "text",
+        },
+        {
           label: "Tên",
           name: "name",
+          type: "text",
           value: skillToEdit.name,
         },
       ],
@@ -71,8 +113,23 @@ router.get(
 router.post(
   "/new",
   expressAsyncHandler(async (req, res) => {
-    const { name } = req.body;
-    const newSkill = new Skill({ name, classGroup: req.classGroup.name });
+    const { category, categoryOther, name } = req.body;
+    let newSkill;
+    if (category === "####0000") {
+      newSkill = new Skill({ name, classGroup: req.classGroup.name });
+    } else if (category === "other") {
+      newSkill = new Skill({
+        name,
+        classGroup: req.classGroup.name,
+        category: categoryOther,
+      });
+    } else {
+      newSkill = new Skill({
+        name,
+        classGroup: req.classGroup.name,
+        category,
+      });
+    }
     await newSkill.save();
 
     res.redirect(`/${req.classGroup._id}/skill`);
@@ -83,9 +140,24 @@ router.post(
   "/edit/:id",
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { category, categoryOther, name } = req.body;
+    if (category === "####0000") {
+      await Skill.findByIdAndUpdate(id, {
+        name,
+        category: null,
+      });
+    } else if (category === "other") {
+      await Skill.findByIdAndUpdate(id, {
+        name,
+        category: categoryOther,
+      });
+    } else {
+      await Skill.findByIdAndUpdate(id, {
+        name,
+        category,
+      });
+    }
 
-    await Skill.findByIdAndUpdate(id, { name });
     res.redirect(`/${req.classGroup._id}/skill`);
   })
 );
