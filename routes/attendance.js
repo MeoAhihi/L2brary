@@ -160,7 +160,7 @@ router.post("/", async (req, res) => {
     const { sinhvienIds, sessionId, submitTime = new Date() } = req.body;
     const session = await Session.findById(sessionId);
     const sinhviens = await SinhVien.find({ _id: { $in: sinhvienIds } });
-    submitTime = submitTime == "" ? new Date() : submitTime;  
+    const joinTime = submitTime == "" ? new Date() : submitTime;
 
     async function addToAttendance(id) {
       const sinhvien = await SinhVien.findById(id);
@@ -168,14 +168,14 @@ router.post("/", async (req, res) => {
       session.attendance.push({
         sinhvienId: id,
         sinhvienName: sinhvien.fullName,
-        joinTime: submitTime,
+        joinTime: joinTime,
       });
     }
     if (sinhvienIds instanceof Array) {
       const data = sinhvienIds.map((id) => ({
         sinhvienId: id,
         sinhvienName: sinhviens.find((sv) => sv._id == id).fullName,
-        joinTime: submitTime,
+        joinTime: joinTime,
       }));
       session.attendance.push(...data);
     } else {
@@ -189,6 +189,7 @@ router.post("/", async (req, res) => {
     res.redirect(`${req.classGroup._id}/session/${sessionId}`);
   } catch (error) {
     res.status(400).json({ message: error.message });
+    console.error(error);
   }
 });
 

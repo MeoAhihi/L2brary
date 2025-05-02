@@ -122,10 +122,12 @@ router.get(
     //   attendance,
     // });
 
-    const dates = sessions.map((session) => ({
-      id: session._id.toString(),
-      date: session.startedAt.toISOString().split("T")[0],
-    }));
+    const dates = sessions
+      .sort((a, b) => a.startedAt - b.startedAt)
+      .map((session) => ({
+        id: session._id.toString(),
+        date: session.startedAt.toISOString().split("T")[0],
+      }));
     res.render("read", {
       title: `${cls.name} ${cls.day}(${cls.startTime} - ${cls.endTime})`,
       isCreatable: false,
