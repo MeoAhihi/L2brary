@@ -13,8 +13,8 @@ block content
   ul
     li
       a(href='/sinhvien') Quản lý sinh viên
-    //- li
-    //-   a(href='/attendance') Quản lý điểm danh
+    li
+      a(href='/sinhvien/experiences') Quản lý sinh viên 2
     for classGroup in classGroups
       h2= classGroup.name
       li
@@ -26,8 +26,6 @@ block content
 
   h1 Thống kê
   ul 
-    li
-      a(href='/attendance/statistic') Thống kê điểm danh
     li 
       a(href='/report/score/history') Lịch sử điểm số
 

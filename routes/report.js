@@ -39,6 +39,7 @@ router.get(
         "Điểm số": score.score,
         "Thời điểm": score.createdAt.toLocaleString(),
       })),
+      span:0,
       createPage: "/score/new",
       updatePage: "/score/edit",
       deleteRoute: "/score/delete",

@@ -64,7 +64,6 @@ router.get(
     const filter = classes.filter(
       (cls) => cls.classDetails[0].classGroup === req.classGroup.name
     );
-    const now = new Date();
 
     const sessionsInClasses = filter.map((cls) => ({
       isEditable: true,
