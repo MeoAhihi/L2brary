@@ -308,7 +308,7 @@ router.post(
   })
 );
 
-function isDateString(value: unknown): boolean {
+function isDateString(value) {
   if (typeof value !== 'string') return false;
 
   const date = new Date(value);
