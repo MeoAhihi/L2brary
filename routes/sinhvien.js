@@ -296,7 +296,7 @@ router.post(
         isMale,
         phoneNumber,
         email,
-        joinDate: joinDate ? new Date(joinDate) : null,
+        joinDate: isDateString(joinDate) ? new Date(joinDate) : null,
         group,
         status,
       },
@@ -307,6 +307,14 @@ router.post(
     res.redirect("/sinhvien");
   })
 );
+
+function isDateString(value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+
+  const date = new Date(value);
+  return !isNaN(date.getTime());
+}
+
 
 router.post(
   "/delete/:id",
