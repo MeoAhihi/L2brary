@@ -296,7 +296,7 @@ router.post(
         isMale,
         phoneNumber,
         email,
-        joinDate: new Date(joinDate),
+        joinDate: joinDate ? new Date(joinDate) : null,
         group,
         status,
       },
